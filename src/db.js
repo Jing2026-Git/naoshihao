@@ -15,7 +15,7 @@ db.version(1).stores({
 });
 
 // 升级到 v2：新增 studentProfiles 表
-db.version(2).stores({
+db.version(3).stores({
   settings: 'id, provider, apiKey, apiUrl, modelName',
   papers: '++id, fileName, fileData, textContent, uploadDate, title',
   conversations: '++id, paperId, studentId, messages, createdAt',

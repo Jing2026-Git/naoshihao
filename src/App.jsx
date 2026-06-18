@@ -21,6 +21,8 @@ import {
   getLabProfile,
   saveLabProfile,
   getAllStudentProfiles,
+  getAllPapers,
+  deletePaper,
 } from './db'
 
 // ── 思维模型标签配置 ──────────────────────────────────────────────
@@ -148,6 +150,7 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [labProfileOpen, setLabProfileOpen] = useState(false)
   const [currentPaper, setCurrentPaper] = useState(null)
+  const [papers, setPapers] = useState([])
   const [messages, setMessages] = useState([])
   const [isTyping, setIsTyping] = useState(false)
   const [isLoadingPaper, setIsLoadingPaper] = useState(false)
@@ -159,8 +162,25 @@ export default function App() {
   const messagesRef = useRef(messages)
   messagesRef.current = messages
 
-  // ── 初始化：加载实验室档案和同门列表 ───────────────────────────
+  // ── 初始化：加载论文列表、实验室档案和同门列表 ────────────────
   useEffect(() => {
+    getAllPapers().then((list) => {
+      setPapers(list)
+      // 默认选中最后一篇
+      if (list.length > 0) {
+        setCurrentPaper(list[0])
+        // 加载对应对话
+        (async () => {
+          try {
+            const existing = await getConversationByPaper(list[0].id, activeStudentId)
+            if (existing?.messages?.length > 0) {
+              setMessages(existing.messages)
+            }
+          } catch {}
+        })()
+      }
+    }).catch((err) => console.error('加载论文列表失败:', err))
+
     getLabProfile().then((profile) => {
       if (profile) setLabProfile(profile)
     }).catch((err) => console.error('加载实验室档案失败:', err))
@@ -169,6 +189,50 @@ export default function App() {
       setStudents(list)
     }).catch((err) => console.error('加载同门列表失败:', err))
   }, [])
+
+  // ── 切换论文 ─────────────────────────────────────────────────────
+  const handleSelectPaper = useCallback(async (paper) => {
+    setCurrentPaper(paper)
+    try {
+      const existing = await getConversationByPaper(paper.id, activeStudentId)
+      if (existing?.messages?.length > 0) {
+        setMessages(existing.messages)
+      } else {
+        setMessages([])
+      }
+    } catch {
+      setMessages([])
+    }
+  }, [activeStudentId])
+
+  // ── 删除论文 ─────────────────────────────────────────────────────
+  const handleDeletePaper = useCallback(async (id, e) => {
+    e.stopPropagation()
+    if (!window.confirm('确定要删除这篇论文吗？删除后对话也会被删除。')) return
+
+    await deletePaper(id)
+    setPapers(prev => prev.filter(p => p.id !== id))
+    if (currentPaper?.id === id) {
+      if (papers.length > 1) {
+        const remaining = papers.filter(p => p.id !== id)
+        setCurrentPaper(remaining[0])
+        // 加载对应对话
+        (async () => {
+          try {
+            const existing = await getConversationByPaper(remaining[0].id, activeStudentId)
+            if (existing?.messages?.length > 0) {
+              setMessages(existing.messages)
+            } else {
+              setMessages([])
+            }
+          } catch {}
+        })()
+      } else {
+        setCurrentPaper(null)
+        setMessages([])
+      }
+    }
+  }, [currentPaper, papers, activeStudentId])
 
   // ── 论文上传处理 ────────────────────────────────────────────────
   const handlePaperUpload = useCallback(async (file) => {
@@ -186,8 +250,9 @@ export default function App() {
         fileName: file.name,
       })
 
-      const paper = { id: paperId, title, textContent }
+      const paper = { id: paperId, title, textContent, fileName: file.name, uploadDate: new Date().toISOString() }
       setCurrentPaper(paper)
+      setPapers(prev => [paper, ...prev])
 
       try {
         const existing = await getConversationByPaper(paperId, activeStudentId)
@@ -205,7 +270,7 @@ export default function App() {
     } finally {
       setIsLoadingPaper(false)
     }
-  }, [])
+  }, [activeStudentId])
 
   // ── 发送消息处理 ────────────────────────────────────────────────
   const handleSendMessage = useCallback(
@@ -517,6 +582,10 @@ ${combinedText.slice(0, 30000)}`
             paper={currentPaper}
             isLoading={isLoadingPaper}
             onPaperUpload={handlePaperUpload}
+            papers={papers}
+            currentPaperId={currentPaper?.id}
+            onSelectPaper={handleSelectPaper}
+            onDeletePaper={handleDeletePaper}
           />
         </div>
         <div className="w-[55%] min-w-0">
