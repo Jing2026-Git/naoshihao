@@ -35,6 +35,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
   const [editData, setEditData] = useState(null);
   const [students, setStudents] = useState([]);
   const [showAddStudent, setShowAddStudent] = useState(false);
+  const [editingStudentId, setEditingStudentId] = useState(null);
   const [newStudent, setNewStudent] = useState({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' });
   const [uploadingStudent, setUploadingStudent] = useState(false);
   const [uploadingReportId, setUploadingReportId] = useState(null);
@@ -111,6 +112,37 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
       writingStage: newStudent.writingStage.trim(),
     });
     setNewStudent({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' });
+    setShowAddStudent(false);
+    loadStudents();
+  };
+
+  // 开始编辑学生
+  const handleStartEditStudent = (student) => {
+    setNewStudent({
+      name: student.name,
+      description: student.description || '',
+      projectName: student.projectName || '',
+      projectStage: student.projectStage || '',
+      methodsOfInterest: student.methodsOfInterest || '',
+      writingStage: student.writingStage || '',
+    });
+    setEditingStudentId(student.id);
+    setShowAddStudent(true);
+  };
+
+  // 保存编辑学生
+  const handleSaveEditStudent = async () => {
+    if (!newStudent.name.trim() || !editingStudentId) return;
+    await updateStudentProfile(editingStudentId, {
+      name: newStudent.name.trim(),
+      description: newStudent.description.trim(),
+      projectName: newStudent.projectName.trim(),
+      projectStage: newStudent.projectStage.trim(),
+      methodsOfInterest: newStudent.methodsOfInterest.trim(),
+      writingStage: newStudent.writingStage.trim(),
+    });
+    setNewStudent({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' });
+    setEditingStudentId(null);
     setShowAddStudent(false);
     loadStudents();
   };
@@ -564,8 +596,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               ) : (
                 <div className="glass-card rounded-xl p-5 animate-fade-in-scale space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-[#e8e8ef]">添加同门</h3>
-                    <button onClick={() => setShowAddStudent(false)} className="text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer">
+                    <h3 className="text-sm font-semibold text-[#e8e8ef]">{editingStudentId ? '编辑同门' : '添加同门'}</h3>
+                    <button onClick={() => { setShowAddStudent(false); setEditingStudentId(null); setNewStudent({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' }); }} className="text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -664,11 +696,11 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   </div>
 
                   <button
-                    onClick={handleAddStudent}
+                    onClick={editingStudentId ? handleSaveEditStudent : handleAddStudent}
                     disabled={!newStudent.name.trim() || uploadingStudent}
                     className="w-full btn-primary py-2.5 rounded-xl text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    {uploadingStudent ? '上传解析中...' : '添加'}
+                    {uploadingStudent ? '上传解析中...' : (editingStudentId ? '保存修改' : '添加')}
                   </button>
                 </div>
               )}
@@ -713,12 +745,22 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                             )}
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleDeleteStudent(student.id)}
-                          className="p-1.5 rounded-lg text-[#4a4a5a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)] transition-colors cursor-pointer shrink-0"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleStartEditStudent(student)}
+                      className="p-1.5 rounded-lg text-[#4a4a5a] hover:text-[#a78bfa] hover:bg-[rgba(167,139,250,0.1)] transition-colors cursor-pointer"
+                      title="编辑"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteStudent(student.id)}
+                      className="p-1.5 rounded-lg text-[#4a4a5a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)] transition-colors cursor-pointer"
+                      title="删除"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                       </div>
 
                       {/* 工作汇报区域 */}

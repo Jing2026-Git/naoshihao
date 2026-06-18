@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { FileUp, FileText, Loader2, ClipboardPaste, X, ScrollText, Trash2 } from 'lucide-react';
+import { FileUp, FileText, Loader2, ClipboardPaste, X, ScrollText, Trash2, Plus } from 'lucide-react';
 
 export default function PaperViewer({
   paper,
@@ -71,6 +71,70 @@ export default function PaperViewer({
       <div className="flex-1 overflow-y-auto px-3 py-3">
         {papers.length > 0 ? (
           <div className="space-y-2">
+            {/* 继续上传按钮 */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(167,139,250,0.3)] transition-all cursor-pointer group"
+            >
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/15 to-[#60a5fa]/15 flex items-center justify-center border border-[rgba(167,139,250,0.15)]">
+                <Plus className="w-4 h-4 text-[#a78bfa]" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-[#e8e8ef]">上传新文献</p>
+                <p className="text-[10px] text-[#6b6b7b]">PDF、Word 或粘贴文本</p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </button>
+
+            {/* 粘贴文本按钮 */}
+            {!showPaste ? (
+              <button
+                onClick={() => setShowPaste(true)}
+                className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(34,211,238,0.3)] transition-all cursor-pointer"
+              >
+                <div className="w-7 h-7 rounded-lg bg-[rgba(34,211,238,0.1)] flex items-center justify-center">
+                  <ClipboardPaste className="w-4 h-4 text-[#22d3ee]" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-medium text-[#e8e8ef]">粘贴论文文本</p>
+                  <p className="text-[10px] text-[#6b6b7b]">直接粘贴论文内容</p>
+                </div>
+              </button>
+            ) : (
+              <div className="glass-card rounded-xl p-4 animate-fade-in-scale">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#e8e8ef]">粘贴论文内容</span>
+                  <button
+                    onClick={() => setShowPaste(false)}
+                    className="p-1 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <textarea
+                  value={pasteText}
+                  onChange={(e) => setPasteText(e.target.value)}
+                  placeholder="在此粘贴论文文本内容..."
+                  className="dark-input rounded-lg w-full h-24 px-3 py-2 text-sm resize-none mb-3"
+                />
+                <button
+                  onClick={handlePasteSubmit}
+                  disabled={!pasteText.trim()}
+                  className="btn-primary w-full py-2 rounded-lg text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  开始分析
+                </button>
+              </div>
+            )}
+
+            <div className="h-px bg-[rgba(255,255,255,0.06)] my-2" />
+
             {papers.map((p) => (
               <div
                 key={p.id}
