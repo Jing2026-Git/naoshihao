@@ -1,6 +1,6 @@
 /**
  * 脑师好 - 系统提示词构建模块
- * 根据论文内容和实验室档案动态生成系统提示词
+ * 根据论文内容、实验室档案和同门画像动态生成系统提示词
  */
 
 /**
@@ -8,12 +8,14 @@
  *
  * @param {Object} options
  * @param {string} options.paperContent - 论文全文
- * @param {Object|null} options.labProfile - 实验室档案
+ * @param {Object|null} options.labProfile - 实验室档案（课题组画像，始终存在则注入）
+ * @param {Object|null} options.studentProfile - 同门画像（可选，按对话关联注入）
  * @param {string} [options.modelName] - 当前使用的模型名称
  * @returns {string} 完整的系统提示词
  */
-export function buildSystemPrompt({ paperContent, labProfile, modelName }) {
+export function buildSystemPrompt({ paperContent, labProfile, studentProfile, modelName }) {
   const labContext = buildLabContext(labProfile);
+  const studentContext = buildStudentContext(studentProfile);
   const paperContext = buildPaperContext(paperContent);
 
   const prompt = `【系统指令：你必须严格遵守以下规则，任何情况下不得偏离】
@@ -25,6 +27,8 @@ export function buildSystemPrompt({ paperContent, labProfile, modelName }) {
 你的核心任务**不是直接回答用户提出的问题**，而是通过一个结构化的、深思熟虑的流程，为用户提供最具洞察力和启发性的回应。
 
 ${labContext}
+
+${studentContext}
 
 ${paperContext}
 
@@ -97,12 +101,20 @@ ${paperContext}
 ### 3. 延伸思考（1-2个引导性问题）
 提出能推动用户进一步思考的问题。问题要具体、有针对性，不能是泛泛的"你怎么看"。
 
-### 4. 画像联动（如果存在画像）
-**这是强制要求**：如果提供了读者背景信息（研究方向、关注问题、技术手段），你必须在回答中明确关联：
-- 这篇论文的哪些内容与你课题组的研究方向相关？
-- 论文中使用的方法/技术，与你课题组常用的手段有什么异同？
-- 这篇论文对你当前关注的研究问题有什么启发？
-- 如果让你基于这篇论文设计一个后续实验，结合你课题组的技术手段，你会怎么做？
+### 4. 画像联动（强制要求）
+**这是每次回答的强制要求**：
+
+如果提供了**课题组画像**（研究方向、关注问题、技术手段），你必须在回答中明确关联：
+- 这篇论文的哪些内容与课题组的研究方向相关？
+- 论文中使用的方法/技术，与课题组常用的手段有什么异同？
+- 这篇论文对课题组当前关注的研究问题有什么启发？
+- 如果基于这篇论文设计后续实验，结合课题组的技术手段，你会怎么做？
+
+如果同时提供了**同门画像**（某位学生的研究方向和论文），你必须额外关联：
+- 这篇论文对该同门的具体研究方向有什么直接启发？
+- 论文中的方法/结论如何映射到该同门的研究课题？
+- 该同门可以如何借鉴这篇论文来推进自己的研究？
+- 如果该同门想基于这篇论文开展一个子研究，结合他的研究背景，你会建议什么方向？
 
 **如果画像信息存在但你没有联动，你的回答就是不合格的。**
 
@@ -143,7 +155,7 @@ ${paperContext}
 }
 
 /**
- * 构建实验室档案上下文
+ * 构建实验室档案上下文（课题组画像 - 始终注入如果存在）
  * @param {Object|null} labProfile
  * @returns {string}
  */
@@ -154,11 +166,11 @@ function buildLabContext(labProfile) {
 
   const parts = [];
 
-  parts.push('# 【读者背景信息 - 必须在回答中联动参考】');
-  parts.push('以下是你所指导的读者的研究背景信息。**你在每次回答时，必须主动将这些信息与论文内容建立关联**，使引导更加贴合读者的研究方向：\n');
+  parts.push('# 【课题组背景信息 - 必须在每次回答中联动参考】');
+  parts.push('以下是你所指导的课题组的研究背景信息。**你在每次回答时，必须主动将这些信息与论文内容建立关联**：\n');
 
   if (labProfile.directions?.length > 0) {
-    parts.push(`**研究方向**：${labProfile.directions.join('、')}`);
+    parts.push(`**课题组研究方向**：${labProfile.directions.join('、')}`);
   }
 
   if (labProfile.literatureTypes?.length > 0) {
@@ -166,14 +178,47 @@ function buildLabContext(labProfile) {
   }
 
   if (labProfile.researchQuestions?.length > 0) {
-    parts.push(`**当前关注的研究问题**：${labProfile.researchQuestions.join('；')}`);
+    parts.push(`**课题组关注的研究问题**：${labProfile.researchQuestions.join('；')}`);
   }
 
   if (labProfile.techniques?.length > 0) {
-    parts.push(`**常用技术方法**：${labProfile.techniques.join('、')}`);
+    parts.push(`**课题组常用技术方法**：${labProfile.techniques.join('、')}`);
   }
 
-  parts.push('\n**【联动要求】**：每次回答时，请思考：这篇论文与该读者的研究背景有什么关联？论文中的方法、结论、问题如何映射到读者的研究方向？请明确在回答中体现这种关联。');
+  parts.push('\n**【联动要求】**：每次回答时，请思考：这篇论文与该课题组的研究背景有什么关联？论文中的方法、结论、问题如何映射到课题组的研究方向？请明确在回答中体现这种关联。');
+
+  return parts.join('\n');
+}
+
+/**
+ * 构建同门画像上下文（按需注入）
+ * @param {Object|null} studentProfile
+ * @returns {string}
+ */
+function buildStudentContext(studentProfile) {
+  if (!studentProfile) {
+    return '';
+  }
+
+  const parts = [];
+
+  parts.push('# 【同门背景信息 - 当前对话关联的学生 - 必须在每次回答中联动参考】');
+  parts.push(`以下是你所指导的一位同门学生「${studentProfile.name}」的研究背景信息。**你在每次回答时，必须主动将论文内容与这位同门的研究建立关联**：\n`);
+
+  if (studentProfile.description) {
+    parts.push(`**该同门的研究方向描述**：${studentProfile.description}`);
+  }
+
+  if (studentProfile.fileName) {
+    parts.push(`**已关联的论文/文档**：${studentProfile.fileName}`);
+  }
+
+  if (studentProfile.fileContent) {
+    const preview = studentProfile.fileContent.slice(0, 2000);
+    parts.push(`\n**该同门论文/文档内容预览**：\n\`\`\`\n${preview}\n\`\`\``);
+  }
+
+  parts.push('\n**【联动要求】**：每次回答时，请思考：这篇论文对该同门的具体研究方向有什么直接启发？论文中的方法/结论如何映射到该同门的研究课题？该同门可以如何借鉴这篇论文来推进自己的研究？请明确在回答中体现这种关联。');
 
   return parts.join('\n');
 }

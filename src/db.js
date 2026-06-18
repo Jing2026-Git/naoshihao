@@ -18,7 +18,7 @@ db.version(1).stores({
 db.version(2).stores({
   settings: 'id, provider, apiKey, apiUrl, modelName',
   papers: '++id, fileName, fileData, textContent, uploadDate, title',
-  conversations: '++id, paperId, messages, createdAt',
+  conversations: '++id, paperId, studentId, messages, createdAt',
   labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
   studentProfiles: '++id, name, description, fileName, fileContent, createdAt',
 });
@@ -121,12 +121,16 @@ export async function saveConversation(conversation) {
 }
 
 /**
- * 根据论文 id 获取关联对话
+ * 根据论文 id 和可选的学生 id 获取关联对话
  * @param {number} paperId
+ * @param {number|null} [studentId]
  * @returns {Promise<Object|undefined>}
  */
-export async function getConversationByPaper(paperId) {
-  return db.conversations.where('paperId').equals(paperId).first();
+export async function getConversationByPaper(paperId, studentId = null) {
+  if (studentId) {
+    return db.conversations.where({ paperId, studentId }).first();
+  }
+  return db.conversations.where('paperId').equals(paperId).and(c => !c.studentId).first();
 }
 
 /**

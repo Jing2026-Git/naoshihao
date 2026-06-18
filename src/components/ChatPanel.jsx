@@ -1,16 +1,29 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Brain, Sparkles, User, BookOpen } from 'lucide-react';
+import { Send, Brain, Sparkles, User, BookOpen, Users, ChevronDown, X } from 'lucide-react';
 import TypingIndicator from './TypingIndicator';
 
-export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper }) {
+export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper, students, activeStudentId, onSelectStudent }) {
   const [inputText, setInputText] = useState('');
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  // 点击外部关闭下拉
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowStudentDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -25,20 +38,90 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper 
     }
   };
 
+  const activeStudent = students.find(s => s.id === activeStudentId);
+
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* 标题栏 */}
-      <div className="flex items-center gap-2 px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">
-          <Brain className="w-4 h-4 text-[#a78bfa]" />
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">
+            <Brain className="w-4 h-4 text-[#a78bfa]" />
+          </div>
+          <span className="text-sm font-medium text-[#e8e8ef]">脑师说</span>
+          {hasPaper && (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.15)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]">
+              已加载文献
+            </span>
+          )}
         </div>
-        <span className="text-sm font-medium text-[#e8e8ef]">脑师说</span>
-        {hasPaper && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.15)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]">
-            已加载文献
-          </span>
+
+        {/* 学生选择器 */}
+        {students.length > 0 && hasPaper && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowStudentDropdown(!showStudentDropdown)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                activeStudentId
+                  ? 'bg-[rgba(34,211,238,0.12)] text-[#22d3ee] border border-[rgba(34,211,238,0.2)]'
+                  : 'bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] border border-[rgba(255,255,255,0.08)] hover:text-[#a0a0b0]'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              {activeStudent ? activeStudent.name : '选择同门'}
+              <ChevronDown className={`w-3 h-3 transition-transform ${showStudentDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showStudentDropdown && (
+              <div className="absolute right-0 top-full mt-1.5 w-48 glass-card-strong rounded-xl overflow-hidden z-50 animate-fade-in-scale">
+                <div className="px-3 py-2 border-b border-[rgba(255,255,255,0.06)]">
+                  <p className="text-[10px] text-[#6b6b7b] uppercase tracking-wider">关联同门画像</p>
+                </div>
+                <button
+                  onClick={() => { onSelectStudent(null); setShowStudentDropdown(false); }}
+                  className={`w-full text-left px-3 py-2.5 text-xs transition-colors cursor-pointer flex items-center gap-2 ${
+                    !activeStudentId ? 'bg-[rgba(167,139,250,0.1)] text-[#a78bfa]' : 'text-[#a0a0b0] hover:bg-[rgba(255,255,255,0.03)]'
+                  }`}
+                >
+                  <span className="w-5 h-5 rounded-full bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-[10px]">无</span>
+                  不关联同门
+                </button>
+                {students.map((student) => (
+                  <button
+                    key={student.id}
+                    onClick={() => { onSelectStudent(student.id); setShowStudentDropdown(false); }}
+                    className={`w-full text-left px-3 py-2.5 text-xs transition-colors cursor-pointer flex items-center gap-2 ${
+                      activeStudentId === student.id ? 'bg-[rgba(34,211,238,0.1)] text-[#22d3ee]' : 'text-[#a0a0b0] hover:bg-[rgba(255,255,255,0.03)]'
+                    }`}
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span className="truncate">{student.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
+
+      {/* 关联提示条 */}
+      {activeStudent && hasPaper && (
+        <div className="px-5 py-2 bg-[rgba(34,211,238,0.05)] border-b border-[rgba(34,211,238,0.08)] flex items-center gap-2">
+          <Users className="w-3 h-3 text-[#22d3ee]" />
+          <span className="text-[11px] text-[#22d3ee]">
+            当前对话关联同门：<span className="font-medium">{activeStudent.name}</span>
+            {activeStudent.description && (
+              <span className="text-[#6b6b7b] ml-1">· {activeStudent.description.slice(0, 30)}{activeStudent.description.length > 30 ? '...' : ''}</span>
+            )}
+          </span>
+          <button
+            onClick={() => onSelectStudent(null)}
+            className="ml-auto p-0.5 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
 
       {/* 消息列表 */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
@@ -58,6 +141,9 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper 
               <Sparkles className="w-7 h-7 text-[#a78bfa]" />
             </div>
             <p className="text-sm text-[#6b6b7b]">文献已加载，开始提问吧</p>
+            {activeStudent && (
+              <p className="text-xs text-[#22d3ee] mt-2">已关联同门：{activeStudent.name}，脑师将结合其研究方向作答</p>
+            )}
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -116,7 +202,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper 
 
         {isTyping && (
           <div className="flex gap-3 animate-fade-in">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/30 to-[#c084fc]/30 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/30 to-[#c084fc]/30 flex items-center justify-center">
               <Brain className="w-3.5 h-3.5 text-[#a78bfa]" />
             </div>
             <div className="bg-[rgba(167,139,250,0.08)] border border-[rgba(167,139,250,0.12)] rounded-2xl px-4 py-3">

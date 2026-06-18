@@ -20,6 +20,7 @@ import {
   saveConversation,
   getLabProfile,
   saveLabProfile,
+  getAllStudentProfiles,
 } from './db'
 
 // ── 思维模型标签配置 ──────────────────────────────────────────────
@@ -152,15 +153,21 @@ export default function App() {
   const [isLoadingPaper, setIsLoadingPaper] = useState(false)
   const [labProfile, setLabProfile] = useState(null)
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false)
+  const [students, setStudents] = useState([])
+  const [activeStudentId, setActiveStudentId] = useState(null)
 
   const messagesRef = useRef(messages)
   messagesRef.current = messages
 
-  // ── 初始化：加载实验室档案 ─────────────────────────────────────
+  // ── 初始化：加载实验室档案和同门列表 ───────────────────────────
   useEffect(() => {
     getLabProfile().then((profile) => {
       if (profile) setLabProfile(profile)
     }).catch((err) => console.error('加载实验室档案失败:', err))
+
+    getAllStudentProfiles().then((list) => {
+      setStudents(list)
+    }).catch((err) => console.error('加载同门列表失败:', err))
   }, [])
 
   // ── 论文上传处理 ────────────────────────────────────────────────
@@ -183,7 +190,7 @@ export default function App() {
       setCurrentPaper(paper)
 
       try {
-        const existing = await getConversationByPaper(paperId)
+        const existing = await getConversationByPaper(paperId, activeStudentId)
         if (existing?.messages?.length > 0) {
           setMessages(existing.messages)
         } else {
@@ -222,9 +229,11 @@ export default function App() {
       setIsTyping(true)
 
       try {
+        const activeStudent = activeStudentId ? students.find(s => s.id === activeStudentId) : null
         const systemPrompt = buildSystemPrompt({
           paperContent: currentPaper?.textContent || '',
           labProfile,
+          studentProfile: activeStudent || null,
         })
 
         const chatMessages = [
@@ -269,6 +278,7 @@ export default function App() {
           try {
             await saveConversation({
               paperId: currentPaper.id,
+              studentId: activeStudentId,
               messages: finalMessages,
             })
           } catch (err) {
@@ -415,6 +425,9 @@ ${combinedText.slice(0, 30000)}`
             isTyping={isTyping}
             onSendMessage={handleSendMessage}
             hasPaper={!!currentPaper}
+            students={students}
+            activeStudentId={activeStudentId}
+            onSelectStudent={setActiveStudentId}
           />
         </div>
       </main>
