@@ -304,6 +304,106 @@ export default function App() {
     [currentPaper, labProfile]
   )
 
+  // ── 删除消息 ────────────────────────────────────────────────────
+  const handleDeleteMessage = useCallback((idx) => {
+    setMessages((prev) => {
+      const newMessages = prev.filter((_, i) => i !== idx)
+      // 同步保存到数据库
+      if (currentPaper?.id) {
+        saveConversation({
+          paperId: currentPaper.id,
+          studentId: activeStudentId,
+          messages: newMessages,
+        }).catch((err) => console.error('保存对话失败:', err))
+      }
+      return newMessages
+    })
+  }, [currentPaper, activeStudentId])
+
+  // ── 重新生成消息 ────────────────────────────────────────────────
+  const handleRegenerateMessage = useCallback(async (idx) => {
+    // 找到要重发的用户问题（往前找最近的用户消息）
+    let userQuestion = null
+    for (let i = idx - 1; i >= 0; i--) {
+      if (messages[i]?.role === 'user') {
+        userQuestion = messages[i].content
+        break
+      }
+    }
+
+    if (!userQuestion) return
+
+    // 删除这条 AI 回复及之后的所有消息
+    const newMessages = messages.slice(0, idx)
+    setMessages(newMessages)
+
+    // 重新调用 AI
+    setIsTyping(true)
+    try {
+      const activeStudent = activeStudentId ? students.find(s => s.id === activeStudentId) : null
+      const systemPrompt = buildSystemPrompt({
+        paperContent: currentPaper?.textContent || '',
+        labProfile,
+        studentProfile: activeStudent || null,
+      })
+
+      const fullMessages = [
+        { role: 'system', content: systemPrompt },
+        ...newMessages.map((m) => ({ role: m.role, content: m.content })),
+      ]
+
+      const responseStream = callAI(fullMessages)
+      let aiResponse = ''
+
+      for await (const chunk of responseStream) {
+        aiResponse += chunk
+        setMessages((prev) => {
+          const msgs = [...prev]
+          if (msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
+            msgs[msgs.length - 1] = {
+              ...msgs[msgs.length - 1],
+              content: aiResponse,
+            }
+          } else {
+            msgs.push({
+              role: 'assistant',
+              content: aiResponse,
+              timestamp: new Date().toISOString(),
+            })
+          }
+          return msgs
+        })
+      }
+
+      // 提取思维模型标签
+      const { modelLabel, colorClass, cleanContent } = extractModelTag(aiResponse)
+      const finalMessages = [
+        ...newMessages,
+        {
+          role: 'assistant',
+          content: cleanContent || aiResponse,
+          modelLabel,
+          colorClass,
+          timestamp: new Date().toISOString(),
+        },
+      ]
+      setMessages(finalMessages)
+
+      if (currentPaper?.id) {
+        await saveConversation({
+          paperId: currentPaper.id,
+          studentId: activeStudentId,
+          messages: finalMessages,
+        })
+      }
+    } catch (err) {
+      console.error('重新生成失败:', err)
+      alert(`重新生成失败：${err.message || '未知错误'}`)
+    } finally {
+      setIsTyping(false)
+    }
+  }, [currentPaper, labProfile, activeStudentId, students, messages])
+
   // ── 实验室档案更新处理 ──────────────────────────────────────────
   const handleLabProfileUpdate = useCallback(async (action) => {
     try {
@@ -428,6 +528,8 @@ ${combinedText.slice(0, 30000)}`
             students={students}
             activeStudentId={activeStudentId}
             onSelectStudent={setActiveStudentId}
+            onDeleteMessage={handleDeleteMessage}
+            onRegenerate={handleRegenerateMessage}
           />
         </div>
       </main>

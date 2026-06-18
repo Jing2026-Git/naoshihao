@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Brain, Sparkles, User, BookOpen, Users, ChevronDown, X } from 'lucide-react';
+import { Send, Brain, Sparkles, User, BookOpen, Users, ChevronDown, X, Copy, Check, Trash2, RotateCcw } from 'lucide-react';
 import TypingIndicator from './TypingIndicator';
 
-export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper, students, activeStudentId, onSelectStudent }) {
+export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper, students, activeStudentId, onSelectStudent, onDeleteMessage, onRegenerate }) {
   const [inputText, setInputText] = useState('');
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState(null);
+  const [hoveredMsgIdx, setHoveredMsgIdx] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -36,6 +38,34 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleCopy = async (content, idx) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 2000);
+    } catch {
+      // 降级方案
+      const textarea = document.createElement('textarea');
+      textarea.value = content;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 2000);
+    }
+  };
+
+  const handleDelete = (idx) => {
+    if (window.confirm('确定要删除这条消息吗？')) {
+      onDeleteMessage?.(idx);
+    }
+  };
+
+  const handleRegenerate = (idx) => {
+    onRegenerate?.(idx);
   };
 
   const activeStudent = students.find(s => s.id === activeStudentId);
@@ -148,11 +178,14 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
         ) : (
           messages.map((msg, idx) => {
             const isUser = msg.role === 'user';
+            const isLastAssistant = !isUser && idx === messages.length - 1 && !isTyping;
             return (
               <div
                 key={idx}
-                className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fade-in`}
+                className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group`}
                 style={{ animationDelay: `${idx * 0.05}s` }}
+                onMouseEnter={() => setHoveredMsgIdx(idx)}
+                onMouseLeave={() => setHoveredMsgIdx(null)}
               >
                 {/* 头像 */}
                 <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
@@ -167,10 +200,10 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                   )}
                 </div>
 
-                {/* 气泡 */}
+                {/* 气泡 + 操作栏 */}
                 <div className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
                   <div
-                    className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    className={`rounded-2xl px-4 py-3 text-sm leading-relaxed relative ${
                       isUser
                         ? 'bg-[rgba(96,165,250,0.12)] border border-[rgba(96,165,250,0.15)] text-[#e8e8ef]'
                         : 'bg-[rgba(167,139,250,0.08)] border border-[rgba(167,139,250,0.12)] text-[#a0a0b0]'
@@ -185,9 +218,55 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                     )}
                   </div>
 
+                  {/* 操作按钮栏 */}
+                  <div className={`flex items-center gap-1 mt-1 px-1 transition-opacity duration-200 ${
+                    hoveredMsgIdx === idx ? 'opacity-100' : 'opacity-0'
+                  }`}>
+                    {/* 复制按钮 */}
+                    <button
+                      onClick={() => handleCopy(msg.content, idx)}
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#6b6b7b] hover:text-[#a0a0b0] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
+                      title="复制"
+                    >
+                      {copiedIdx === idx ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span className="text-emerald-400">已复制</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>复制</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* 删除按钮 */}
+                    <button
+                      onClick={() => handleDelete(idx)}
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#6b6b7b] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors cursor-pointer"
+                      title="删除"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>删除</span>
+                    </button>
+
+                    {/* 重发按钮（仅对最后一条 AI 消息） */}
+                    {!isUser && isLastAssistant && (
+                      <button
+                        onClick={() => handleRegenerate(idx)}
+                        className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#6b6b7b] hover:text-[#a78bfa] hover:bg-[rgba(167,139,250,0.08)] transition-colors cursor-pointer"
+                        title="重新生成"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>重试</span>
+                      </button>
+                    )}
+                  </div>
+
                   {/* 思维模型标签 */}
                   {!isUser && msg.modelLabel && (
-                    <div className="flex items-center gap-1.5 mt-1.5 px-1">
+                    <div className="flex items-center gap-1.5 mt-1 px-1">
                       <Sparkles className="w-3 h-3 text-[#a78bfa]" />
                       <span className={`text-[10px] px-2 py-0.5 rounded-full border ${msg.colorClass || 'bg-[rgba(167,139,250,0.1)] text-[#a78bfa] border-[rgba(167,139,250,0.2)]'}`}>
                         {msg.modelLabel}
