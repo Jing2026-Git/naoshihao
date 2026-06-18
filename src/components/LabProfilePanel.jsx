@@ -35,7 +35,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
   const [editData, setEditData] = useState(null);
   const [students, setStudents] = useState([]);
   const [showAddStudent, setShowAddStudent] = useState(false);
-  const [newStudent, setNewStudent] = useState({ name: '', description: '' });
+  const [newStudent, setNewStudent] = useState({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' });
   const [uploadingStudent, setUploadingStudent] = useState(false);
   const [uploadingReportId, setUploadingReportId] = useState(null);
 
@@ -75,6 +75,9 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
       literatureTypes: profile?.literatureTypes?.join('\n') || '',
       researchQuestions: profile?.researchQuestions?.join('\n') || '',
       techniques: profile?.techniques?.join('\n') || '',
+      journalQuality: profile?.journalQuality?.join('\n') || '',
+      researchParadigm: profile?.researchParadigm?.join('\n') || '',
+      qualityStandards: profile?.qualityStandards?.join('\n') || '',
     });
     setIsEditing(true);
   };
@@ -87,6 +90,9 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
       literatureTypes: editData.literatureTypes.split('\n').map(s => s.trim()).filter(Boolean),
       researchQuestions: editData.researchQuestions.split('\n').map(s => s.trim()).filter(Boolean),
       techniques: editData.techniques.split('\n').map(s => s.trim()).filter(Boolean),
+      journalQuality: editData.journalQuality.split('\n').map(s => s.trim()).filter(Boolean),
+      researchParadigm: editData.researchParadigm.split('\n').map(s => s.trim()).filter(Boolean),
+      qualityStandards: editData.qualityStandards.split('\n').map(s => s.trim()).filter(Boolean),
     };
     onUpdate?.({ type: 'edit', data: updated });
     setIsEditing(false);
@@ -99,8 +105,12 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
     await saveStudentProfile({
       name: newStudent.name.trim(),
       description: newStudent.description.trim(),
+      projectName: newStudent.projectName.trim(),
+      projectStage: newStudent.projectStage.trim(),
+      methodsOfInterest: newStudent.methodsOfInterest.trim(),
+      writingStage: newStudent.writingStage.trim(),
     });
-    setNewStudent({ name: '', description: '' });
+    setNewStudent({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' });
     setShowAddStudent(false);
     loadStudents();
   };
@@ -298,6 +308,48 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     />
                   </div>
 
+                  <div className="glass-card rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookOpen className="w-4 h-4 text-[#f59e0b]" />
+                      <h3 className="text-sm font-semibold text-[#e8e8ef]">期刊质量偏好</h3>
+                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                    </div>
+                    <textarea
+                      value={editData.journalQuality}
+                      onChange={(e) => setEditData({ ...editData, journalQuality: e.target.value })}
+                      className="dark-input rounded-lg w-full h-16 px-3 py-2 text-sm resize-none"
+                      placeholder="如：高影响因子期刊（IF>5）&#10;方法学创新优先&#10;Nature子刊级别"
+                    />
+                  </div>
+
+                  <div className="glass-card rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Tag className="w-4 h-4 text-[#ec4899]" />
+                      <h3 className="text-sm font-semibold text-[#e8e8ef]">研究范式偏好</h3>
+                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                    </div>
+                    <textarea
+                      value={editData.researchParadigm}
+                      onChange={(e) => setEditData({ ...editData, researchParadigm: e.target.value })}
+                      className="dark-input rounded-lg w-full h-16 px-3 py-2 text-sm resize-none"
+                      placeholder="如：计算建模驱动&#10;大样本行为实验&#10;多模态神经影像"
+                    />
+                  </div>
+
+                  <div className="glass-card rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
+                      <h3 className="text-sm font-semibold text-[#e8e8ef]">文献质量标准</h3>
+                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                    </div>
+                    <textarea
+                      value={editData.qualityStandards}
+                      onChange={(e) => setEditData({ ...editData, qualityStandards: e.target.value })}
+                      className="dark-input rounded-lg w-full h-16 px-3 py-2 text-sm resize-none"
+                      placeholder="如：要求预注册&#10;开放数据与代码&#10;效应量报告&#10;多重比较校正"
+                    />
+                  </div>
+
                   <div className="flex items-center gap-3">
                     <button
                       onClick={handleSaveEdit}
@@ -425,6 +477,48 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     </div>
                   )}
 
+                  {profile.journalQuality?.length > 0 && (
+                    <div className="glass-card rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <BookOpen className="w-4 h-4 text-[#f59e0b]" />
+                        <h3 className="text-sm font-semibold text-[#e8e8ef]">期刊质量偏好</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.journalQuality.map((item, idx) => (
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(245,158,11,0.12)] text-[#f59e0b] border border-[rgba(245,158,11,0.2)]">{item}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {profile.researchParadigm?.length > 0 && (
+                    <div className="glass-card rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Tag className="w-4 h-4 text-[#ec4899]" />
+                        <h3 className="text-sm font-semibold text-[#e8e8ef]">研究范式偏好</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.researchParadigm.map((item, idx) => (
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(236,72,153,0.12)] text-[#ec4899] border border-[rgba(236,72,153,0.2)]">{item}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {profile.qualityStandards?.length > 0 && (
+                    <div className="glass-card rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
+                        <h3 className="text-sm font-semibold text-[#e8e8ef]">文献质量标准</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.qualityStandards.map((item, idx) => (
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(34,211,238,0.12)] text-[#22d3ee] border border-[rgba(34,211,238,0.2)]">{item}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={handleStartEdit}
@@ -493,7 +587,65 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                       value={newStudent.description}
                       onChange={(e) => setNewStudent({ ...newStudent, description: e.target.value })}
                       placeholder="描述该学生的研究方向、关注的问题、常用技术等..."
-                      className="dark-input rounded-lg w-full h-24 px-3 py-2 text-sm resize-none"
+                      className="dark-input rounded-lg w-full h-20 px-3 py-2 text-sm resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-[#6b6b7b] mb-1">当前课题项目</label>
+                    <input
+                      type="text"
+                      value={newStudent.projectName}
+                      onChange={(e) => setNewStudent({ ...newStudent, projectName: e.target.value })}
+                      placeholder="如：认知控制与决策的神经机制研究"
+                      className="dark-input rounded-lg w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-[#6b6b7b] mb-1">课题阶段</label>
+                      <select
+                        value={newStudent.projectStage}
+                        onChange={(e) => setNewStudent({ ...newStudent, projectStage: e.target.value })}
+                        className="dark-input rounded-lg w-full px-3 py-2 text-sm appearance-none cursor-pointer"
+                      >
+                        <option value="">选择阶段</option>
+                        <option value="文献调研">文献调研</option>
+                        <option value="实验设计">实验设计</option>
+                        <option value="数据收集">数据收集</option>
+                        <option value="数据分析">数据分析</option>
+                        <option value="论文撰写">论文撰写</option>
+                        <option value="投稿修改">投稿修改</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-[#6b6b7b] mb-1">论文撰写阶段</label>
+                      <select
+                        value={newStudent.writingStage}
+                        onChange={(e) => setNewStudent({ ...newStudent, writingStage: e.target.value })}
+                        className="dark-input rounded-lg w-full px-3 py-2 text-sm appearance-none cursor-pointer"
+                      >
+                        <option value="">选择阶段</option>
+                        <option value="尚未开始">尚未开始</option>
+                        <option value="引言/文献综述">引言/文献综述</option>
+                        <option value="方法部分">方法部分</option>
+                        <option value="结果部分">结果部分</option>
+                        <option value="讨论部分">讨论部分</option>
+                        <option value="全文整合">全文整合</option>
+                        <option value="导师修改">导师修改</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-[#6b6b7b] mb-1">关注的方法/技术</label>
+                    <input
+                      type="text"
+                      value={newStudent.methodsOfInterest}
+                      onChange={(e) => setNewStudent({ ...newStudent, methodsOfInterest: e.target.value })}
+                      placeholder="如：fMRI、计算建模、眼动追踪"
+                      className="dark-input rounded-lg w-full px-3 py-2 text-sm"
                     />
                   </div>
 
@@ -532,10 +684,26 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                             <GraduationCap className="w-4 h-4 text-[#22d3ee]" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-[#e8e8ef]">{student.name}</h4>
-                            {student.description && (
-                              <p className="text-xs text-[#a0a0b0] mt-1 leading-relaxed line-clamp-3">{student.description}</p>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-semibold text-[#e8e8ef]">{student.name}</h4>
+                              {student.projectStage && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(34,211,238,0.12)] text-[#22d3ee] border border-[rgba(34,211,238,0.2)]">{student.projectStage}</span>
+                              )}
+                            </div>
+                            {student.projectName && (
+                              <p className="text-[11px] text-[#a78bfa] mt-0.5 truncate">{student.projectName}</p>
                             )}
+                            {student.description && (
+                              <p className="text-xs text-[#a0a0b0] mt-1 leading-relaxed line-clamp-2">{student.description}</p>
+                            )}
+                            <div className="flex flex-wrap gap-1.5 mt-1.5">
+                              {student.methodsOfInterest && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(96,165,250,0.1)] text-[#60a5fa] border border-[rgba(96,165,250,0.15)]">{student.methodsOfInterest}</span>
+                              )}
+                              {student.writingStage && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.1)] text-[#a78bfa] border border-[rgba(167,139,250,0.15)]">撰写：{student.writingStage}</span>
+                              )}
+                            </div>
                             {student.fileName && (
                               <div className="flex items-center gap-1 mt-1.5">
                                 <FileText className="w-3 h-3 text-[#6b6b7b]" />

@@ -14,13 +14,13 @@ db.version(1).stores({
   labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
 });
 
-// 升级到 v2：新增 studentProfiles 表
-db.version(3).stores({
+// 升级到 v4：画像字段扩充
+db.version(4).stores({
   settings: 'id, provider, apiKey, apiUrl, modelName',
   papers: '++id, fileName, fileData, textContent, uploadDate, title',
   conversations: '++id, paperId, studentId, messages, createdAt',
-  labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
-  studentProfiles: '++id, name, description, fileName, fileContent, reportContent, reportFileName, reportCreatedAt, createdAt',
+  labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, journalQuality, researchParadigm, qualityStandards, rawText, createdAt, updatedAt',
+  studentProfiles: '++id, name, description, projectName, projectStage, methodsOfInterest, writingStage, fileName, fileContent, reportContent, reportFileName, reportCreatedAt, createdAt',
 });
 
 // 免费模型默认配置（Pollinations.AI，无需 API Key）
