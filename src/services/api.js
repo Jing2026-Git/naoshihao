@@ -28,6 +28,7 @@ function buildRequestConfig(messages, options, settings, stream) {
       messages,
       stream,
       temperature: options.temperature ?? 0.7,
+      max_tokens: options.maxTokens ?? 4096,
     };
     return {
       url,

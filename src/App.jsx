@@ -24,10 +24,10 @@ import {
 
 // ── 思维模型标签配置 ──────────────────────────────────────────────
 const THINKING_MODELS = [
-  { name: '苏格拉底诘问法', color: 'bg-amber-100 text-amber-800 border-amber-300' },
-  { name: '第一性原理', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
-  { name: '布鲁姆认知金字塔', color: 'bg-blue-100 text-blue-800 border-blue-300' },
-  { name: '水平思考法', color: 'bg-purple-100 text-purple-800 border-purple-300' },
+  { name: '苏格拉底诘问法', color: 'bg-[rgba(251,191,36,0.15)] text-amber-300 border-[rgba(251,191,36,0.3)]' },
+  { name: '第一性原理', color: 'bg-[rgba(52,211,153,0.15)] text-emerald-300 border-[rgba(52,211,153,0.3)]' },
+  { name: '布鲁姆认知金字塔', color: 'bg-[rgba(96,165,250,0.15)] text-blue-300 border-[rgba(96,165,250,0.3)]' },
+  { name: '水平思考法', color: 'bg-[rgba(167,139,250,0.15)] text-purple-300 border-[rgba(167,139,250,0.3)]' },
 ]
 
 /**
@@ -40,16 +40,35 @@ function extractModelTag(content) {
     return { modelLabel: null, colorClass: null, cleanContent: content }
   }
 
+  // 只提取【思维模型选择】模块的内容（到下一个 # 或 --- 或空行开头）
+  const moduleMatch = content.match(/【思维模型选择】[\s\S]*?(?=\n#|\n---|\n\n[A-Z\u4e00-\u9fff]|\z)/)
+  const moduleText = moduleMatch ? moduleMatch[0] : ''
+
+  // 在模块内容中查找"选择的模型："后面的模型名称
   let matchedModel = null
-  for (const model of THINKING_MODELS) {
-    if (content.includes(model.name)) {
-      matchedModel = model
-      break
+  const choiceMatch = moduleText.match(/选择的模型[：:]\s*(.+)/)
+  if (choiceMatch) {
+    const chosenName = choiceMatch[1].trim()
+    for (const model of THINKING_MODELS) {
+      if (chosenName.includes(model.name)) {
+        matchedModel = model
+        break
+      }
+    }
+  }
+
+  // 如果没找到，退回到在模块内搜索
+  if (!matchedModel) {
+    for (const model of THINKING_MODELS) {
+      if (moduleText.includes(model.name)) {
+        matchedModel = model
+        break
+      }
     }
   }
 
   if (matchedModel) {
-    // 移除整个【思维模型选择】...段落（到下一个 # 或 --- 或空行）
+    // 移除整个【思维模型选择】...段落
     const regex = /【思维模型选择】[\s\S]*?(?=\n#|\n---|\n\n[A-Z\u4e00-\u9fff]|\z)/
     const cleanContent = content.replace(regex, '').trim()
     return {
