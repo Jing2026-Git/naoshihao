@@ -14,6 +14,15 @@ db.version(1).stores({
   labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
 });
 
+// 升级到 v2：新增 studentProfiles 表
+db.version(2).stores({
+  settings: 'id, provider, apiKey, apiUrl, modelName',
+  papers: '++id, fileName, fileData, textContent, uploadDate, title',
+  conversations: '++id, paperId, messages, createdAt',
+  labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
+  studentProfiles: '++id, name, description, fileName, fileContent, createdAt',
+});
+
 // 免费模型默认配置（Pollinations.AI，无需 API Key）
 export const FREE_MODEL_CONFIG = {
   provider: 'free',
@@ -159,4 +168,47 @@ export async function saveLabProfile(profile) {
  */
 export async function getLabProfile() {
   return db.labProfile.get('lab');
+}
+
+// ========================
+// Student Profiles 相关操作
+// ========================
+
+/**
+ * 保存学生画像
+ * @param {Object} student - { name, description, fileName?, fileContent? }
+ * @returns {Promise<number>}
+ */
+export async function saveStudentProfile(student) {
+  return db.studentProfiles.add({
+    ...student,
+    createdAt: new Date().toISOString(),
+  });
+}
+
+/**
+ * 更新学生画像
+ * @param {number} id
+ * @param {Object} updates
+ * @returns {Promise<void>}
+ */
+export async function updateStudentProfile(id, updates) {
+  await db.studentProfiles.update(id, updates);
+}
+
+/**
+ * 删除学生画像
+ * @param {number} id
+ * @returns {Promise<void>}
+ */
+export async function deleteStudentProfile(id) {
+  await db.studentProfiles.delete(id);
+}
+
+/**
+ * 获取所有学生画像
+ * @returns {Promise<Array>}
+ */
+export async function getAllStudentProfiles() {
+  return db.studentProfiles.orderBy('createdAt').reverse().toArray();
 }

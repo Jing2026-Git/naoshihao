@@ -295,15 +295,31 @@ export default function App() {
   )
 
   // ── 实验室档案更新处理 ──────────────────────────────────────────
-  const handleLabProfileUpdate = useCallback(async (profile) => {
+  const handleLabProfileUpdate = useCallback(async (action) => {
     try {
-      await saveLabProfile(profile)
-      setLabProfile(profile)
+      if (action.type === 'edit' && action.data) {
+        // 编辑模式：直接用用户修改的数据
+        const updatedProfile = {
+          ...labProfile,
+          ...action.data,
+          updatedAt: new Date().toISOString(),
+        }
+        await saveLabProfile(updatedProfile)
+        setLabProfile(updatedProfile)
+      } else if (action.type === 'regenerate') {
+        // 重新生成：清空画像
+        await saveLabProfile(null)
+        setLabProfile(null)
+      } else {
+        // 直接保存（AI 生成的结果）
+        await saveLabProfile(action)
+        setLabProfile(action)
+      }
     } catch (err) {
       console.error('保存实验室档案失败:', err)
       alert('保存实验室档案失败，请重试。')
     }
-  }, [])
+  }, [labProfile])
 
   // ── 实验室档案文件上传处理 ──────────────────────────────────────
   const handleLabProfileFilesUpload = useCallback(
