@@ -1,152 +1,158 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Brain, Send, Sparkles } from 'lucide-react';
+import { Send, Brain, Sparkles, User, BookOpen } from 'lucide-react';
 import TypingIndicator from './TypingIndicator';
 
-export default function ChatPanel({ messages, onSendMessage, isTyping, hasPaper }) {
-  const [input, setInput] = useState('');
+export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper }) {
+  const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // 自动滚动到底部
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // 自动调整 textarea 高度
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`;
-    }
-  }, [input]);
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+    onSendMessage(inputText.trim());
+    setInputText('');
+  };
 
-  const handleSend = useCallback(() => {
-    const trimmed = input.trim();
-    if (!trimmed || isTyping) return;
-    onSendMessage?.(trimmed);
-    setInput('');
-    // 重置 textarea 高度
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
-  }, [input, isTyping, onSendMessage]);
-
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    },
-    [handleSend]
-  );
+  };
 
   return (
-    <div className="flex flex-col h-full bg-surface">
+    <div className="flex flex-col h-full bg-[#0a0a0f]">
       {/* 标题栏 */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border shrink-0">
-        <Brain className="w-4 h-4 text-primary-600" />
-        <h2 className="text-sm font-semibold text-text-primary">脑师说</h2>
-      </div>
-
-      {/* 消息区域 */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {!hasPaper && messages.length === 0 ? (
-          /* 欢迎消息 */
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-50 text-primary-500 mb-4">
-              <Brain className="w-7 h-7" />
-            </div>
-            <h3 className="text-base font-semibold text-text-primary mb-2">
-              欢迎使用脑师好
-            </h3>
-            <p className="text-sm text-text-secondary leading-relaxed max-w-sm">
-              上传一篇学术文献，脑师将基于您的画像为您解读文献内容、分析研究方法、提炼核心观点，并提供个性化的学术见解。
-            </p>
-          </div>
-        ) : (
-          /* 消息列表 */
-          <div className="space-y-4">
-            {messages.map((msg, idx) => {
-              const isUser = msg.role === 'user';
-              return (
-                <div
-                  key={idx}
-                  className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}
-                >
-                  <div
-                    className={`max-w-[80%] ${
-                      isUser ? 'order-1' : ''
-                    }`}
-                  >
-                    {/* 消息气泡 */}
-                    <div
-                      className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                        isUser
-                          ? 'bg-primary-600 text-white rounded-br-md'
-                          : 'bg-surface-secondary text-text-primary rounded-bl-md'
-                      }`}
-                    >
-                      {isUser ? (
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                      ) : (
-                        <div className="markdown-content">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* AI 消息标签 */}
-                    {!isUser && msg.modelLabel && (
-                      <div className="flex items-center gap-1.5 mt-1.5 px-1">
-                        <Sparkles className="w-3 h-3 text-text-tertiary" />
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${msg.colorClass || 'bg-surface-secondary text-text-tertiary border-border'}`}>
-                          {msg.modelLabel}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* 输入中指示器 */}
-            {isTyping && (
-              <div className="flex justify-start animate-fade-in">
-                <div className="bg-surface-secondary rounded-2xl rounded-bl-md px-4 py-3">
-                  <TypingIndicator />
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
+      <div className="flex items-center gap-2 px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
+        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">
+          <Brain className="w-4 h-4 text-[#a78bfa]" />
+        </div>
+        <span className="text-sm font-medium text-[#e8e8ef]">脑师说</span>
+        {hasPaper && (
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.15)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]">
+            已加载文献
+          </span>
         )}
       </div>
 
-      {/* 输入区域 */}
-      <div className="px-4 py-3 border-t border-border shrink-0">
-        <div className="flex items-end gap-2">
+      {/* 消息列表 */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        {!hasPaper ? (
+          <div className="h-full flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#a78bfa]/10 to-[#60a5fa]/10 flex items-center justify-center mb-5 border border-[rgba(167,139,250,0.15)] animate-glow-pulse">
+              <BookOpen className="w-10 h-10 text-[#a78bfa]" />
+            </div>
+            <h3 className="text-lg font-semibold text-[#e8e8ef] mb-2">欢迎使用脑师好</h3>
+            <p className="text-sm text-[#6b6b7b] max-w-xs leading-relaxed">
+              在左侧上传一篇学术文献，脑师将基于苏格拉底学习法为您深度解读
+            </p>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#a78bfa]/10 to-[#60a5fa]/10 flex items-center justify-center mb-4 border border-[rgba(167,139,250,0.15)]">
+              <Sparkles className="w-7 h-7 text-[#a78bfa]" />
+            </div>
+            <p className="text-sm text-[#6b6b7b]">文献已加载，开始提问吧</p>
+          </div>
+        ) : (
+          messages.map((msg, idx) => {
+            const isUser = msg.role === 'user';
+            return (
+              <div
+                key={idx}
+                className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fade-in`}
+                style={{ animationDelay: `${idx * 0.05}s` }}
+              >
+                {/* 头像 */}
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                  isUser
+                    ? 'bg-gradient-to-br from-[#60a5fa]/30 to-[#22d3ee]/30'
+                    : 'bg-gradient-to-br from-[#a78bfa]/30 to-[#c084fc]/30'
+                }`}>
+                  {isUser ? (
+                    <User className="w-3.5 h-3.5 text-[#60a5fa]" />
+                  ) : (
+                    <Brain className="w-3.5 h-3.5 text-[#a78bfa]" />
+                  )}
+                </div>
+
+                {/* 气泡 */}
+                <div className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
+                  <div
+                    className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                      isUser
+                        ? 'bg-[rgba(96,165,250,0.12)] border border-[rgba(96,165,250,0.15)] text-[#e8e8ef]'
+                        : 'bg-[rgba(167,139,250,0.08)] border border-[rgba(167,139,250,0.12)] text-[#a0a0b0]'
+                    }`}
+                  >
+                    {isUser ? (
+                      msg.content
+                    ) : (
+                      <div className="markdown-content">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 思维模型标签 */}
+                  {!isUser && msg.modelLabel && (
+                    <div className="flex items-center gap-1.5 mt-1.5 px-1">
+                      <Sparkles className="w-3 h-3 text-[#a78bfa]" />
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${msg.colorClass || 'bg-[rgba(167,139,250,0.1)] text-[#a78bfa] border-[rgba(167,139,250,0.2)]'}`}>
+                        {msg.modelLabel}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        {isTyping && (
+          <div className="flex gap-3 animate-fade-in">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/30 to-[#c084fc]/30 flex items-center justify-center shrink-0">
+              <Brain className="w-3.5 h-3.5 text-[#a78bfa]" />
+            </div>
+            <div className="bg-[rgba(167,139,250,0.08)] border border-[rgba(167,139,250,0.12)] rounded-2xl px-4 py-3">
+              <TypingIndicator />
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* 输入区 */}
+      <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.06)]">
+        <div className="glass-card rounded-xl flex items-end gap-2 p-2">
           <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            ref={inputRef}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={hasPaper ? '输入您的问题...' : '请先上传文献...'}
+            placeholder={hasPaper ? "向脑师提问..." : "请先上传文献"}
             disabled={!hasPaper}
             rows={1}
-            className="flex-1 resize-none px-3 py-2 rounded-xl border border-border bg-surface text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-transparent border-none text-sm text-[#e8e8ef] placeholder:text-[#4a4a5a] resize-none py-2 px-2 focus:outline-none max-h-32 disabled:opacity-40"
+            style={{ minHeight: '36px' }}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || isTyping || !hasPaper}
-            className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
+            disabled={!hasPaper || !inputText.trim()}
+            className="w-9 h-9 rounded-lg btn-primary flex items-center justify-center shrink-0 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <Send className="w-4 h-4" />
           </button>
         </div>
+        <p className="text-[10px] text-[#4a4a5a] mt-1.5 text-center">
+          Enter 发送 · Shift+Enter 换行
+        </p>
       </div>
     </div>
   );

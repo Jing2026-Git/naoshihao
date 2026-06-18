@@ -359,7 +359,7 @@ ${combinedText.slice(0, 30000)}`
 
   // ── 渲染 ────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-full bg-surface">
+    <div className="flex flex-col h-full bg-[#0a0a0f]">
       <TopBar
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenLabProfile={() => setLabProfileOpen(true)}
@@ -367,7 +367,7 @@ ${combinedText.slice(0, 30000)}`
       />
 
       <main className="flex flex-1 min-h-0 overflow-hidden">
-        <div className="w-[45%] min-w-0 border-r border-border">
+        <div className="w-[45%] min-w-0 border-r border-[rgba(255,255,255,0.06)]">
           <PaperViewer
             paper={currentPaper}
             isLoading={isLoadingPaper}

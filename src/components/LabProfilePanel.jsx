@@ -36,18 +36,20 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/30 transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-surface shadow-2xl animate-slide-in-right flex flex-col">
+      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-[#111118] shadow-2xl animate-slide-in-right flex flex-col border-l border-[rgba(255,255,255,0.06)]">
         {/* 标题栏 */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(255,255,255,0.06)] shrink-0">
           <div className="flex items-center gap-2">
-            <FlaskConical className="w-5 h-5 text-primary-600" />
-            <h2 className="text-lg font-semibold text-text-primary">脑师画像</h2>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">
+              <FlaskConical className="w-4 h-4 text-[#a78bfa]" />
+            </div>
+            <h2 className="text-base font-semibold text-[#e8e8ef]">脑师画像</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[#6b6b7b] hover:text-[#e8e8ef] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -57,31 +59,33 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {isGenerating ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 className="w-8 h-8 text-primary-500 animate-spin mb-4" />
-              <p className="text-sm text-text-secondary">正在分析文献，生成脑师画像...</p>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center mb-4">
+                <Loader2 className="w-6 h-6 text-[#a78bfa] animate-spin" />
+              </div>
+              <p className="text-sm text-[#6b6b7b]">正在分析文献，生成脑师画像...</p>
             </div>
           ) : !profile ? (
             <div className="space-y-4">
-              <p className="text-sm text-text-secondary leading-relaxed">
+              <p className="text-sm text-[#6b6b7b] leading-relaxed">
                 尚未创建脑师画像。请通过以下方式导入您的文献信息，系统将自动生成画像。
               </p>
 
               {/* 上传文献清单 */}
               <button
                 onClick={() => handleImportClick('.csv,.xlsx,.xls')}
-                className="w-full p-5 rounded-xl border border-border hover:border-primary-300 hover:bg-primary-50/50 transition-all text-left group cursor-pointer"
+                className="w-full glass-card rounded-xl p-5 text-left hover:border-[rgba(167,139,250,0.3)] transition-all cursor-pointer group"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent-50 text-accent-600 group-hover:bg-accent-100 transition-colors shrink-0">
-                    <FileSpreadsheet className="w-6 h-6" />
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#a78bfa]/15 to-[#c084fc]/15 flex items-center justify-center shrink-0 border border-[rgba(167,139,250,0.15)]">
+                    <FileSpreadsheet className="w-5 h-5 text-[#a78bfa]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-text-primary">上传文献清单</h3>
-                      <ChevronRight className="w-4 h-4 text-text-tertiary group-hover:text-primary-500 transition-colors" />
+                      <h3 className="text-sm font-semibold text-[#e8e8ef]">上传文献清单</h3>
+                      <ChevronRight className="w-4 h-4 text-[#4a4a5a] group-hover:text-[#a78bfa] transition-colors" />
                     </div>
-                    <p className="mt-1 text-xs text-text-secondary leading-relaxed">
-                      支持 CSV 格式。包含标题、作者、摘要等字段的文献列表，用于分析研究方向和偏好。
+                    <p className="mt-1 text-xs text-[#6b6b7b] leading-relaxed">
+                      支持 CSV 格式。包含标题、作者、摘要等字段的文献列表。
                     </p>
                   </div>
                 </div>
@@ -90,19 +94,19 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               {/* 上传典型文献 */}
               <button
                 onClick={() => handleImportClick('.pdf')}
-                className="w-full p-5 rounded-xl border border-border hover:border-primary-300 hover:bg-primary-50/50 transition-all text-left group cursor-pointer"
+                className="w-full glass-card rounded-xl p-5 text-left hover:border-[rgba(96,165,250,0.3)] transition-all cursor-pointer group"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary-50 text-primary-600 group-hover:bg-primary-100 transition-colors shrink-0">
-                    <FileText className="w-6 h-6" />
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#60a5fa]/15 to-[#22d3ee]/15 flex items-center justify-center shrink-0 border border-[rgba(96,165,250,0.15)]">
+                    <FileText className="w-5 h-5 text-[#60a5fa]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-text-primary">上传典型文献</h3>
-                      <ChevronRight className="w-4 h-4 text-text-tertiary group-hover:text-primary-500 transition-colors" />
+                      <h3 className="text-sm font-semibold text-[#e8e8ef]">上传典型文献</h3>
+                      <ChevronRight className="w-4 h-4 text-[#4a4a5a] group-hover:text-[#60a5fa] transition-colors" />
                     </div>
-                    <p className="mt-1 text-xs text-text-secondary leading-relaxed">
-                      支持上传多篇 PDF 文献。系统将深入分析内容，提取研究方向、方法和技术特征。
+                    <p className="mt-1 text-xs text-[#6b6b7b] leading-relaxed">
+                      支持上传多篇 PDF 文献，系统将深入分析内容。
                     </p>
                   </div>
                 </div>
@@ -117,19 +121,19 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               />
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* 研究方向 */}
               {profile.directions?.length > 0 && (
-                <div className="rounded-xl border border-border p-4">
+                <div className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4 text-primary-500" />
-                    <h3 className="text-sm font-semibold text-text-primary">研究方向</h3>
+                    <Tag className="w-4 h-4 text-[#a78bfa]" />
+                    <h3 className="text-sm font-semibold text-[#e8e8ef]">研究方向</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {profile.directions.map((dir, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200"
+                        className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(167,139,250,0.12)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]"
                       >
                         {dir}
                       </span>
@@ -140,16 +144,16 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
               {/* 文献类型偏好 */}
               {profile.literatureTypes?.length > 0 && (
-                <div className="rounded-xl border border-border p-4">
+                <div className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-4 h-4 text-accent-500" />
-                    <h3 className="text-sm font-semibold text-text-primary">文献类型偏好</h3>
+                    <BookOpen className="w-4 h-4 text-[#60a5fa]" />
+                    <h3 className="text-sm font-semibold text-[#e8e8ef]">文献类型偏好</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {profile.literatureTypes.map((type, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 rounded-full text-xs font-medium bg-accent-50 text-accent-700 border border-accent-200"
+                        className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(96,165,250,0.12)] text-[#60a5fa] border border-[rgba(96,165,250,0.2)]"
                       >
                         {type}
                       </span>
@@ -160,18 +164,18 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
               {/* 典型研究问题 */}
               {profile.researchQuestions?.length > 0 && (
-                <div className="rounded-xl border border-border p-4">
+                <div className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <CircleHelp className="w-4 h-4 text-primary-500" />
-                    <h3 className="text-sm font-semibold text-text-primary">典型研究问题</h3>
+                    <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
+                    <h3 className="text-sm font-semibold text-[#e8e8ef]">典型研究问题</h3>
                   </div>
                   <ul className="space-y-2">
                     {profile.researchQuestions.map((q, idx) => (
                       <li
                         key={idx}
-                        className="flex items-start gap-2 text-sm text-text-secondary leading-relaxed"
+                        className="flex items-start gap-2 text-sm text-[#a0a0b0] leading-relaxed"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee] mt-1.5 shrink-0" />
                         {q}
                       </li>
                     ))}
@@ -181,16 +185,16 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
               {/* 关键技术手段 */}
               {profile.techniques?.length > 0 && (
-                <div className="rounded-xl border border-border p-4">
+                <div className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Beaker className="w-4 h-4 text-accent-500" />
-                    <h3 className="text-sm font-semibold text-text-primary">关键技术手段</h3>
+                    <Beaker className="w-4 h-4 text-[#a78bfa]" />
+                    <h3 className="text-sm font-semibold text-[#e8e8ef]">关键技术手段</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {profile.techniques.map((tech, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 rounded-full text-xs font-medium bg-surface-secondary text-text-secondary border border-border"
+                        className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(255,255,255,0.05)] text-[#a0a0b0] border border-[rgba(255,255,255,0.08)]"
                       >
                         {tech}
                       </span>
@@ -203,14 +207,14 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => onUpdate?.({ type: 'edit' })}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border border-[rgba(255,255,255,0.1)] text-[#a0a0b0] hover:text-[#e8e8ef] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
                 >
                   <Pencil className="w-4 h-4" />
                   编辑画像
                 </button>
                 <button
                   onClick={() => onUpdate?.({ type: 'regenerate' })}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   <RefreshCw className="w-4 h-4" />
                   重新生成
