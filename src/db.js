@@ -8,11 +8,19 @@ import Dexie from 'dexie';
 const db = new Dexie('NaoshihaoDB');
 
 db.version(1).stores({
-  settings: 'id, apiKey, apiUrl, modelName',
+  settings: 'id, provider, apiKey, apiUrl, modelName',
   papers: '++id, fileName, fileData, textContent, uploadDate, title',
   conversations: '++id, paperId, messages, createdAt',
   labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
 });
+
+// 免费模型默认配置（Pollinations.AI，无需 API Key）
+export const FREE_MODEL_CONFIG = {
+  provider: 'free',
+  apiUrl: 'https://text.pollinations.ai/openai',
+  modelName: 'openai',
+  apiKey: '',
+};
 
 export default db;
 
@@ -25,7 +33,12 @@ export default db;
  * @returns {Promise<Object|null>}
  */
 export async function getSettings() {
-  return db.settings.get('app');
+  const settings = await db.settings.get('app');
+  // 如果没有设置，返回免费模型默认配置
+  if (!settings) {
+    return { ...FREE_MODEL_CONFIG };
+  }
+  return settings;
 }
 
 /**

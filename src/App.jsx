@@ -184,17 +184,6 @@ export default function App() {
   // ── 发送消息处理 ────────────────────────────────────────────────
   const handleSendMessage = useCallback(
     async (text) => {
-      try {
-        const settings = await getSettings()
-        if (!settings?.apiKey || !settings?.apiUrl) {
-          alert('请先在设置中配置 API')
-          return
-        }
-      } catch {
-        alert('请先在设置中配置 API')
-        return
-      }
-
       const userMessage = {
         role: 'user',
         content: text,
@@ -301,17 +290,6 @@ export default function App() {
   const handleLabProfileFilesUpload = useCallback(
     async (files) => {
       if (!files || files.length === 0) return
-
-      try {
-        const settings = await getSettings()
-        if (!settings?.apiKey || !settings?.apiUrl) {
-          alert('请先在设置中配置 API')
-          return
-        }
-      } catch {
-        alert('请先在设置中配置 API')
-        return
-      }
 
       setIsGeneratingProfile(true)
       try {

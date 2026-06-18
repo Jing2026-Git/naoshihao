@@ -1,9 +1,97 @@
-import { getSettings } from '../db.js';
+import { getSettings, FREE_MODEL_CONFIG } from '../db.js';
 
 /**
  * 脑师好 - AI API 服务模块
- * 支持 OpenAI 兼容格式的流式和非流式调用
+ * 支持两种模式：
+ * 1. 免费模型（Pollinations.AI，无需 API Key）
+ * 2. 自定义 API（OpenAI 兼容格式，用户自带 Key）
  */
+
+/**
+ * 判断是否为免费模型
+ */
+function isFreeModel(settings) {
+  return settings?.provider === 'free' || !settings?.apiKey;
+}
+
+/**
+ * 构建请求参数
+ */
+function buildRequestConfig(messages, options, settings, stream) {
+  const isFree = isFreeModel(settings);
+
+  if (isFree) {
+    // 免费模型：Pollinations.AI OpenAI 兼容端点
+    const url = FREE_MODEL_CONFIG.apiUrl;
+    const body = {
+      model: options.modelName || FREE_MODEL_CONFIG.modelName,
+      messages,
+      stream,
+      temperature: options.temperature ?? 0.7,
+    };
+    return {
+      url,
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    };
+  }
+
+  // 自定义 API：OpenAI 兼容格式
+  const modelName = options.modelName || settings.modelName || 'gpt-4o-mini';
+  const baseUrl = (settings.apiUrl || '').replace(/\/+$/, '');
+  const url = `${baseUrl}/chat/completions`;
+  const body = {
+    model: modelName,
+    messages,
+    stream,
+    temperature: options.temperature ?? 0.7,
+    max_tokens: options.maxTokens ?? 4096,
+  };
+  return {
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${settings.apiKey}`,
+    },
+    body,
+  };
+}
+
+/**
+ * 处理 API 错误响应
+ */
+async function handleErrorResponse(response) {
+  const errorBody = await response.text().catch(() => '未知错误');
+  let errorMessage = `API 请求失败（${response.status}）`;
+
+  try {
+    const parsed = JSON.parse(errorBody);
+    if (parsed.error?.message) {
+      errorMessage += `：${parsed.error.message}`;
+    }
+  } catch {
+    errorMessage += `：${errorBody.slice(0, 200)}`;
+  }
+
+  switch (response.status) {
+    case 401:
+      errorMessage = 'API Key 无效或已过期，请检查设置';
+      break;
+    case 403:
+      errorMessage = 'API 访问被拒绝，请检查权限';
+      break;
+    case 429:
+      errorMessage = '请求过于频繁，请稍后再试';
+      break;
+    case 500:
+    case 502:
+    case 503:
+      errorMessage = 'AI 服务暂时不可用，请稍后再试';
+      break;
+  }
+
+  throw new Error(errorMessage);
+}
 
 /**
  * 流式调用 AI 接口
@@ -20,71 +108,30 @@ import { getSettings } from '../db.js';
 export async function* callAI(messages, options = {}) {
   const settings = await getSettings();
 
-  if (!settings?.apiKey) {
-    throw new Error('请先在设置中配置 API Key');
+  if (!isFreeModel(settings)) {
+    if (!settings?.apiKey) {
+      throw new Error('请先在设置中配置 API Key');
+    }
+    if (!settings?.apiUrl) {
+      throw new Error('请先在设置中配置 API 地址');
+    }
   }
 
-  if (!settings?.apiUrl) {
-    throw new Error('请先在设置中配置 API 地址');
-  }
-
-  const modelName = options.modelName || settings.modelName || 'gpt-4o-mini';
-  const baseUrl = settings.apiUrl.replace(/\/+$/, '');
-  const url = `${baseUrl}/chat/completions`;
-
-  const body = {
-    model: modelName,
-    messages,
-    stream: true,
-    temperature: options.temperature ?? 0.7,
-    max_tokens: options.maxTokens ?? 4096,
-  };
+  const config = buildRequestConfig(messages, options, settings, true);
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await fetch(config.url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${settings.apiKey}`,
-      },
-      body: JSON.stringify(body),
+      headers: config.headers,
+      body: JSON.stringify(config.body),
     });
   } catch (networkError) {
-    throw new Error(`网络请求失败，请检查 API 地址是否正确：${networkError.message}`);
+    throw new Error(`网络请求失败，请检查网络连接：${networkError.message}`);
   }
 
   if (!response.ok) {
-    const errorBody = await response.text().catch(() => '未知错误');
-    let errorMessage = `API 请求失败（${response.status}）`;
-
-    try {
-      const parsed = JSON.parse(errorBody);
-      if (parsed.error?.message) {
-        errorMessage += `：${parsed.error.message}`;
-      }
-    } catch {
-      errorMessage += `：${errorBody.slice(0, 200)}`;
-    }
-
-    switch (response.status) {
-      case 401:
-        errorMessage = 'API Key 无效或已过期，请检查设置';
-        break;
-      case 403:
-        errorMessage = 'API 访问被拒绝，请检查权限';
-        break;
-      case 429:
-        errorMessage = '请求过于频繁，请稍后再试';
-        break;
-      case 500:
-      case 502:
-      case 503:
-        errorMessage = 'AI 服务暂时不可用，请稍后再试';
-        break;
-    }
-
-    throw new Error(errorMessage);
+    await handleErrorResponse(response);
   }
 
   const reader = response.body.getReader();
@@ -98,7 +145,6 @@ export async function* callAI(messages, options = {}) {
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
-      // 保留最后一行（可能不完整）
       buffer = lines.pop() || '';
 
       for (const line of lines) {
@@ -138,71 +184,30 @@ export async function* callAI(messages, options = {}) {
 export async function callAINonStream(messages, options = {}) {
   const settings = await getSettings();
 
-  if (!settings?.apiKey) {
-    throw new Error('请先在设置中配置 API Key');
+  if (!isFreeModel(settings)) {
+    if (!settings?.apiKey) {
+      throw new Error('请先在设置中配置 API Key');
+    }
+    if (!settings?.apiUrl) {
+      throw new Error('请先在设置中配置 API 地址');
+    }
   }
 
-  if (!settings?.apiUrl) {
-    throw new Error('请先在设置中配置 API 地址');
-  }
-
-  const modelName = options.modelName || settings.modelName || 'gpt-4o-mini';
-  const baseUrl = settings.apiUrl.replace(/\/+$/, '');
-  const url = `${baseUrl}/chat/completions`;
-
-  const body = {
-    model: modelName,
-    messages,
-    stream: false,
-    temperature: options.temperature ?? 0.7,
-    max_tokens: options.maxTokens ?? 4096,
-  };
+  const config = buildRequestConfig(messages, options, settings, false);
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await fetch(config.url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${settings.apiKey}`,
-      },
-      body: JSON.stringify(body),
+      headers: config.headers,
+      body: JSON.stringify(config.body),
     });
   } catch (networkError) {
-    throw new Error(`网络请求失败，请检查 API 地址是否正确：${networkError.message}`);
+    throw new Error(`网络请求失败，请检查网络连接：${networkError.message}`);
   }
 
   if (!response.ok) {
-    const errorBody = await response.text().catch(() => '未知错误');
-    let errorMessage = `API 请求失败（${response.status}）`;
-
-    try {
-      const parsed = JSON.parse(errorBody);
-      if (parsed.error?.message) {
-        errorMessage += `：${parsed.error.message}`;
-      }
-    } catch {
-      errorMessage += `：${errorBody.slice(0, 200)}`;
-    }
-
-    switch (response.status) {
-      case 401:
-        errorMessage = 'API Key 无效或已过期，请检查设置';
-        break;
-      case 403:
-        errorMessage = 'API 访问被拒绝，请检查权限';
-        break;
-      case 429:
-        errorMessage = '请求过于频繁，请稍后再试';
-        break;
-      case 500:
-      case 502:
-      case 503:
-        errorMessage = 'AI 服务暂时不可用，请稍后再试';
-        break;
-    }
-
-    throw new Error(errorMessage);
+    await handleErrorResponse(response);
   }
 
   try {
