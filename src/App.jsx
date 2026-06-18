@@ -93,6 +93,9 @@ function parseProfileResponse(text) {
     literatureTypes: [],
     researchQuestions: [],
     techniques: [],
+    journalQuality: [],
+    researchParadigm: [],
+    qualityStandards: [],
   }
 
   try {
@@ -103,6 +106,9 @@ function parseProfileResponse(text) {
       if (parsed.literatureTypes) profile.literatureTypes = parsed.literatureTypes
       if (parsed.researchQuestions) profile.researchQuestions = parsed.researchQuestions
       if (parsed.techniques) profile.techniques = parsed.techniques
+      if (parsed.journalQuality) profile.journalQuality = parsed.journalQuality
+      if (parsed.researchParadigm) profile.researchParadigm = parsed.researchParadigm
+      if (parsed.qualityStandards) profile.qualityStandards = parsed.qualityStandards
       return profile
     }
   } catch {
@@ -121,6 +127,12 @@ function parseProfileResponse(text) {
       profile.researchQuestions = extractListItems(section)
     } else if (lower.includes('技术') || lower.includes('technique') || lower.includes('方法')) {
       profile.techniques = extractListItems(section)
+    } else if (lower.includes('期刊') || lower.includes('journal')) {
+      profile.journalQuality = extractListItems(section)
+    } else if (lower.includes('范式') || lower.includes('paradigm')) {
+      profile.researchParadigm = extractListItems(section)
+    } else if (lower.includes('质量') || lower.includes('quality') || lower.includes('标准')) {
+      profile.qualityStandards = extractListItems(section)
     }
   }
 
@@ -533,7 +545,10 @@ export default function App() {
   "directions": ["研究方向1", "研究方向2", ...],
   "literatureTypes": ["文献类型1", "文献类型2", ...],
   "researchQuestions": ["核心研究问题1", "核心研究问题2", ...],
-  "techniques": ["技术方法1", "技术方法2", ...]
+  "techniques": ["技术方法1", "技术方法2", ...],
+  "journalQuality": ["期刊质量偏好1", "期刊质量偏好2", ...],
+  "researchParadigm": ["研究范式偏好1", "研究范式偏好2", ...],
+  "qualityStandards": ["文献质量标准1", "文献质量标准2", ...]
 }
 
 字段说明：
@@ -541,6 +556,9 @@ export default function App() {
 - literatureTypes: 该研究组常关注的文献类型（如：fMRI研究、EEG研究、行为实验、元分析等）
 - researchQuestions: 该研究组关注的核心研究问题（3-5个）
 - techniques: 该研究组常用的实验技术和分析方法（3-5个）
+- journalQuality: 从上传文献发布的期刊档次、引用习惯，推断该研究组对期刊质量的偏好（如："高影响因子期刊（IF>5）"、"方法学创新优先"等，2-4个）
+- researchParadigm: 从上传文献的内容，推断该研究组偏好的研究范式（如："计算建模驱动"、"大样本行为实验"、"多模态神经影像"等，2-4个）
+- qualityStandards: 从上传文献的严谨度，推断该研究组对文献质量的要求（如："要求预注册"、"开放数据与代码"、"效应量报告"、"多重比较校正"等，2-4个）
 
 请仅返回 JSON，不要包含其他文字说明。
 
@@ -550,7 +568,7 @@ ${combinedText.slice(0, 30000)}`
         const response = await callAINonStream([
           {
             role: 'system',
-            content: '你是一个认知神经科学领域的研究分析专家，擅长从论文和文件中提取研究组的研究特征。请严格按照要求的 JSON 格式返回结果。',
+            content: '你是一个认知神经科学领域的研究分析专家，擅长从论文和文件中提取研究组的研究特征。请严格按照要求的 JSON 格式返回结果，包含 directions、literatureTypes、researchQuestions、techniques、journalQuality、researchParadigm、qualityStandards 七个字段。',
           },
           { role: 'user', content: prompt },
         ])
