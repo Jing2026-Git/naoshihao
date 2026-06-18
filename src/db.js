@@ -20,7 +20,7 @@ db.version(2).stores({
   papers: '++id, fileName, fileData, textContent, uploadDate, title',
   conversations: '++id, paperId, studentId, messages, createdAt',
   labProfile: 'id, directions, literatureTypes, researchQuestions, techniques, rawText, createdAt, updatedAt',
-  studentProfiles: '++id, name, description, fileName, fileContent, createdAt',
+  studentProfiles: '++id, name, description, fileName, fileContent, reportContent, reportFileName, reportCreatedAt, createdAt',
 });
 
 // 免费模型默认配置（Pollinations.AI，无需 API Key）

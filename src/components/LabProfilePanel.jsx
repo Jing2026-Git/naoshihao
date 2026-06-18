@@ -20,13 +20,16 @@ import {
   GraduationCap,
   FileUp,
   CheckCircle,
+  ClipboardPaste,
+  Upload,
 } from 'lucide-react';
-import { saveStudentProfile, deleteStudentProfile } from '../db';
+import { saveStudentProfile, updateStudentProfile, deleteStudentProfile } from '../db';
 import { parseDocument } from '../services/parser';
 
 export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, onFilesUpload, isGenerating }) {
   const fileInputRef = useRef(null);
   const studentFileRef = useRef(null);
+  const reportFileRefs = useRef({});
   const [activeTab, setActiveTab] = useState('lab'); // 'lab' | 'students'
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -34,6 +37,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [newStudent, setNewStudent] = useState({ name: '', description: '' });
   const [uploadingStudent, setUploadingStudent] = useState(false);
+  const [uploadingReportId, setUploadingReportId] = useState(null);
 
   // 加载学生画像列表
   useEffect(() => {
@@ -131,6 +135,45 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
   const handleDeleteStudent = async (id) => {
     await deleteStudentProfile(id);
     loadStudents();
+  };
+
+  // 上传工作汇报
+  const handleReportUpload = async (studentId, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingReportId(studentId);
+    try {
+      const content = await parseDocument(file);
+      await updateStudentProfile(studentId, {
+        reportContent: content.slice(0, 50000),
+        reportFileName: file.name,
+        reportCreatedAt: new Date().toISOString(),
+      });
+      loadStudents();
+    } catch (err) {
+      console.error('解析工作汇报失败:', err);
+      alert('工作汇报解析失败，请检查格式。');
+    } finally {
+      setUploadingReportId(null);
+    }
+    e.target.value = '';
+  };
+
+  // 粘贴工作汇报文本
+  const handleReportPaste = async (studentId) => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) return;
+      await updateStudentProfile(studentId, {
+        reportContent: text.slice(0, 50000),
+        reportFileName: '粘贴的工作汇报',
+        reportCreatedAt: new Date().toISOString(),
+      });
+      loadStudents();
+    } catch {
+      alert('无法读取剪贴板，请手动粘贴。');
+    }
   };
 
   return (
@@ -508,6 +551,61 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
+                      </div>
+
+                      {/* 工作汇报区域 */}
+                      <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.06)]">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <ClipboardPaste className="w-3.5 h-3.5 text-[#a78bfa]" />
+                            <span className="text-xs font-medium text-[#a0a0b0]">工作汇报</span>
+                          </div>
+                          {student.reportFileName && student.reportCreatedAt && (
+                            <span className="text-[10px] text-[#4a4a5a]">
+                              {new Date(student.reportCreatedAt).toLocaleDateString('zh-CN')}
+                            </span>
+                          )}
+                        </div>
+
+                        {student.reportContent ? (
+                          <div className="rounded-lg bg-[rgba(167,139,250,0.06)] border border-[rgba(167,139,250,0.1)] p-3">
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <CheckCircle className="w-3 h-3 text-emerald-400" />
+                              <span className="text-[10px] text-emerald-400">{student.reportFileName}</span>
+                            </div>
+                            <p className="text-[11px] text-[#6b6b7b] leading-relaxed line-clamp-4">{student.reportContent.slice(0, 300)}</p>
+                            {student.reportContent.length > 300 && (
+                              <span className="text-[10px] text-[#4a4a5a]">...（共 {student.reportContent.length} 字）</span>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-[#4a4a5a] mb-2">暂无工作汇报，上传后脑师将了解该同门的最新进展</p>
+                        )}
+
+                        <div className="flex items-center gap-2 mt-2">
+                          <button
+                            onClick={() => reportFileRefs.current[student.id]?.click()}
+                            disabled={uploadingReportId === student.id}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-[rgba(255,255,255,0.08)] text-[#6b6b7b] hover:text-[#a0a0b0] hover:border-[rgba(255,255,255,0.15)] transition-all cursor-pointer disabled:opacity-50"
+                          >
+                            <Upload className="w-3 h-3" />
+                            {uploadingReportId === student.id ? '解析中...' : '上传文件'}
+                          </button>
+                          <button
+                            onClick={() => handleReportPaste(student.id)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-[rgba(255,255,255,0.08)] text-[#6b6b7b] hover:text-[#a0a0b0] hover:border-[rgba(255,255,255,0.15)] transition-all cursor-pointer"
+                          >
+                            <ClipboardPaste className="w-3 h-3" />
+                            粘贴文本
+                          </button>
+                          <input
+                            ref={(el) => { reportFileRefs.current[student.id] = el; }}
+                            type="file"
+                            accept=".pdf,.doc,.docx,.txt,.md"
+                            className="hidden"
+                            onChange={(e) => handleReportUpload(student.id, e)}
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}

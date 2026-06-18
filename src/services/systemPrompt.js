@@ -218,6 +218,10 @@ function buildStudentContext(studentProfile) {
     parts.push(`\n**该同门论文/文档内容预览**：\n\`\`\`\n${preview}\n\`\`\``);
   }
 
+  if (studentProfile.reportContent) {
+    parts.push(`\n**该同门的最新工作汇报**（${studentProfile.reportFileName || '文本'}）：\n\`\`\`\n${studentProfile.reportContent.slice(0, 3000)}\n\`\`\``);
+  }
+
   parts.push('\n**【联动要求】**：每次回答时，请思考：这篇论文对该同门的具体研究方向有什么直接启发？论文中的方法/结论如何映射到该同门的研究课题？该同门可以如何借鉴这篇论文来推进自己的研究？请明确在回答中体现这种关联。');
 
   return parts.join('\n');
