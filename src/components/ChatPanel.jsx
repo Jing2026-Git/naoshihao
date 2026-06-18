@@ -26,7 +26,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper 
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f]">
+    <div className="flex flex-col h-full bg-transparent">
       {/* 标题栏 */}
       <div className="flex items-center gap-2 px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">

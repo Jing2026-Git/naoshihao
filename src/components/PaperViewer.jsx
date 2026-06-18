@@ -45,7 +45,7 @@ export default function PaperViewer({ paper, onPaperUpload, isLoading }) {
   }, [pasteText, onPaperUpload]);
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f]">
+    <div className="flex flex-col h-full bg-transparent">
       {/* 标题栏 */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-2">

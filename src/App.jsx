@@ -378,7 +378,7 @@ ${combinedText.slice(0, 30000)}`
 
   // ── 渲染 ────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f]">
+    <div className="flex flex-col h-full bg-transparent">
       <TopBar
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenLabProfile={() => setLabProfileOpen(true)}

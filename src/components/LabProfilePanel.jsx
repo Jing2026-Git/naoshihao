@@ -38,7 +38,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
     <>
       <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-[#111118] shadow-2xl animate-slide-in-right flex flex-col border-l border-[rgba(255,255,255,0.06)]">
+      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-[rgba(20,12,40,0.95)] backdrop-blur-xl shadow-2xl animate-slide-in-right flex flex-col border-l border-[rgba(167,139,250,0.12)]">
         {/* 标题栏 */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(255,255,255,0.06)] shrink-0">
           <div className="flex items-center gap-2">

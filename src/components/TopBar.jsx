@@ -1,22 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Brain, FlaskConical, Save, Check, Sparkles } from 'lucide-react';
+import { Brain, FlaskConical, Save, Check, Sparkles, KeyRound, Globe } from 'lucide-react';
 import { getSettings, saveSettings, FREE_MODEL_CONFIG } from '../db';
-
-const MODEL_OPTIONS = [
-  { value: 'openai', label: 'GPT-4o (免费)' },
-  { value: 'mistral', label: 'Mistral (免费)' },
-  { value: 'deepseek-chat', label: 'DeepSeek' },
-  { value: 'gpt-4o', label: 'GPT-4o' },
-  { value: 'glm-4', label: '智谱GLM-4' },
-  { value: 'qwen-turbo', label: '通义千问' },
-];
 
 export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
   const [apiKey, setApiKey] = useState('');
   const [apiUrl, setApiUrl] = useState('');
   const [modelName, setModelName] = useState('openai');
   const [saved, setSaved] = useState(false);
-  const [isCustom, setIsCustom] = useState(false);
+  const [mode, setMode] = useState('free'); // 'free' | 'custom'
 
   useEffect(() => {
     getSettings().then((settings) => {
@@ -24,16 +15,19 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
         setApiKey(settings.apiKey || '');
         setApiUrl(settings.apiUrl || '');
         setModelName(settings.modelName || 'openai');
-        setIsCustom(settings.provider === 'custom');
+        setMode(settings.provider === 'custom' ? 'custom' : 'free');
       }
     });
   }, []);
 
   const handleSave = useCallback(async () => {
-    const isFreeModel = !apiKey && !apiUrl;
-    if (isFreeModel) {
+    if (mode === 'free') {
       await saveSettings({ ...FREE_MODEL_CONFIG, modelName });
     } else {
+      if (!apiUrl || !apiKey) {
+        alert('请填写 API 地址和 API Key');
+        return;
+      }
       await saveSettings({
         provider: 'custom',
         apiKey,
@@ -43,20 +37,7 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
     }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-  }, [apiKey, apiUrl, modelName]);
-
-  const handleModelChange = (e) => {
-    const val = e.target.value;
-    setModelName(val);
-    const freeModels = ['openai', 'mistral'];
-    if (freeModels.includes(val)) {
-      setApiKey('');
-      setApiUrl('');
-      setIsCustom(false);
-    } else {
-      setIsCustom(true);
-    }
-  };
+  }, [mode, apiKey, apiUrl, modelName]);
 
   return (
     <header className="glass-card-strong shrink-0 z-50 relative">
@@ -73,48 +54,78 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
         </div>
 
         {/* 配置栏 */}
-        <div className="flex items-center gap-3 flex-1 mx-6 max-w-2xl">
-          {/* 模型选择 */}
-          <div className="relative shrink-0">
-            <select
-              value={modelName}
-              onChange={handleModelChange}
-              className="dark-input rounded-lg px-3 py-2 text-sm pr-8 appearance-none cursor-pointer min-w-[140px]"
+        <div className="flex items-center gap-3 flex-1 mx-6">
+          {/* 模式切换 */}
+          <div className="flex items-center bg-[#1a1a24] rounded-lg p-0.5 border border-[rgba(255,255,255,0.06)] shrink-0">
+            <button
+              onClick={() => setMode('free')}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                mode === 'free'
+                  ? 'bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white'
+                  : 'text-[#6b6b7b] hover:text-[#a0a0b0]'
+              }`}
             >
-              <optgroup label="免费模型">
-                <option value="openai">GPT-4o (免费)</option>
-                <option value="mistral">Mistral (免费)</option>
-              </optgroup>
-              <optgroup label="自定义模型">
-                <option value="deepseek-chat">DeepSeek</option>
-                <option value="gpt-4o">GPT-4o</option>
-                <option value="glm-4">智谱GLM-4</option>
-                <option value="qwen-turbo">通义千问</option>
-              </optgroup>
-            </select>
-            <Sparkles className="w-3.5 h-3.5 text-[#a78bfa] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              免费模型
+            </button>
+            <button
+              onClick={() => setMode('custom')}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                mode === 'custom'
+                  ? 'bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white'
+                  : 'text-[#6b6b7b] hover:text-[#a0a0b0]'
+              }`}
+            >
+              自定义模型
+            </button>
           </div>
 
-          {/* API URL */}
-          {isCustom && (
-            <input
-              type="url"
-              value={apiUrl}
-              onChange={(e) => setApiUrl(e.target.value)}
-              placeholder="API 地址"
-              className="dark-input rounded-lg px-3 py-2 text-sm flex-1 min-w-[120px]"
-            />
-          )}
-
-          {/* API Key */}
-          {isCustom && (
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="API Key"
-              className="dark-input rounded-lg px-3 py-2 text-sm flex-1 min-w-[120px]"
-            />
+          {mode === 'free' ? (
+            /* 免费模型选择 */
+            <div className="relative shrink-0">
+              <select
+                value={modelName}
+                onChange={(e) => setModelName(e.target.value)}
+                className="dark-input rounded-lg px-3 py-2 text-sm pr-8 appearance-none cursor-pointer min-w-[160px]"
+              >
+                <option value="openai">Pollinations GPT-4o</option>
+                <option value="mistral">Pollinations Mistral</option>
+                <option value="claude-hybridspace">Pollinations Claude</option>
+                <option value="gemini">Pollinations Gemini</option>
+                <option value="deepseek">Pollinations DeepSeek</option>
+              </select>
+              <Sparkles className="w-3.5 h-3.5 text-[#a78bfa] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          ) : (
+            /* 自定义模型输入 */
+            <>
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <Globe className="w-4 h-4 text-[#6b6b7b] shrink-0" />
+                <input
+                  type="url"
+                  value={apiUrl}
+                  onChange={(e) => setApiUrl(e.target.value)}
+                  placeholder="API 地址，如 https://api.deepseek.com"
+                  className="dark-input rounded-lg px-3 py-2 text-sm flex-1 min-w-[120px]"
+                />
+              </div>
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <KeyRound className="w-4 h-4 text-[#6b6b7b] shrink-0" />
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="API Key"
+                  className="dark-input rounded-lg px-3 py-2 text-sm flex-1 min-w-[120px]"
+                />
+              </div>
+              <input
+                type="text"
+                value={modelName}
+                onChange={(e) => setModelName(e.target.value)}
+                placeholder="模型名称"
+                className="dark-input rounded-lg px-3 py-2 text-sm w-32 shrink-0"
+              />
+            </>
           )}
 
           {/* 保存按钮 */}
