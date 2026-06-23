@@ -23,13 +23,28 @@ db.version(4).stores({
   studentProfiles: '++id, name, description, projectName, projectStage, methodsOfInterest, writingStage, fileName, fileContent, reportContent, reportFileName, reportCreatedAt, createdAt',
 });
 
-// 免费模型默认配置（Pollinations.AI，无需 API Key）
-export const FREE_MODEL_CONFIG = {
-  provider: 'free',
-  apiUrl: 'https://text.pollinations.ai/openai',
-  modelName: 'openai',
-  apiKey: '',
-};
+// 免费模型配置列表
+export const FREE_MODEL_PROVIDERS = [
+  {
+    id: 'siliconflow',
+    name: 'SiliconFlow（推荐）',
+    desc: '国内稳定，DeepSeek-V3 免费',
+    apiUrl: 'https://api.siliconflow.cn/v1',
+    modelName: 'deepseek-ai/DeepSeek-V3',
+    apiKey: '',
+  },
+  {
+    id: 'pollinations',
+    name: 'Pollinations.AI',
+    desc: '海外聚合，无需注册',
+    apiUrl: 'https://text.pollinations.ai/openai',
+    modelName: 'openai',
+    apiKey: '',
+  },
+];
+
+// 默认使用 SiliconFlow
+export const FREE_MODEL_CONFIG = FREE_MODEL_PROVIDERS[0];
 
 export default db;
 

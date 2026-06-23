@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Brain, Sparkles, User, BookOpen, Users, ChevronDown, X, Copy, Check, Trash2, RotateCcw } from 'lucide-react';
+import { Send, Brain, Sparkles, User, BookOpen, Users, ChevronDown, X, Copy, Check, Trash2, RotateCcw, ClipboardList, GraduationCap, BookMarked } from 'lucide-react';
 import TypingIndicator from './TypingIndicator';
 
 export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper, students, activeStudentId, onSelectStudent, onDeleteMessage, onRegenerate }) {
@@ -16,7 +16,6 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // 点击外部关闭下拉
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -67,11 +66,30 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
     onRegenerate?.(idx);
   };
 
+  // 快捷按钮：画像评估
+  const handleProfileEval = () => {
+    onSendMessage('请对这篇文献进行画像评估：分析文献质量是否符合课题组标准、结论对研究领域是否有推动、研究范式是否有借鉴价值。', { includeProfile: true });
+  };
+
+  // 快捷按钮：同门关联
+  const handleStudentLink = () => {
+    if (!activeStudentId) {
+      alert('请先选择关联的同门');
+      return;
+    }
+    onSendMessage('请分析这篇文献对当前关联同门的参考价值：结论启发、方法借鉴、实验设计参考、文章撰写启示。', { includeProfile: true });
+  };
+
+  // 快捷按钮：文献精读
+  const handleDeepRead = () => {
+    onSendMessage('请对这篇文献进行精读分析。', { deepReadMode: true });
+  };
+
   const activeStudent = students.find(s => s.id === activeStudentId);
 
   return (
     <div className="flex flex-col h-full bg-transparent">
-      {/* 标题栏 - 更简洁 */}
+      {/* 标题栏 */}
       <div className="flex items-center justify-between px-6 py-3.5 border-b border-[rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#c49bff]/25 to-[#7ab8ff]/25 flex items-center justify-center border border-[rgba(196,155,255,0.2)]">
@@ -154,7 +172,37 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
         </div>
       )}
 
-      {/* 消息列表 - 更宽的气泡和更大的字体 */}
+      {/* 快捷功能按钮栏 */}
+      {hasPaper && (
+        <div className="px-6 py-2.5 border-b border-[rgba(255,255,255,0.08)] flex items-center gap-2 flex-wrap">
+          <button
+            onClick={handleProfileEval}
+            disabled={isTyping}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-[rgba(196,155,255,0.12)] text-[#c49bff] border border-[rgba(196,155,255,0.2)] hover:bg-[rgba(196,155,255,0.2)] transition-colors cursor-pointer disabled:opacity-40"
+          >
+            <ClipboardList className="w-3.5 h-3.5" />
+            画像评估
+          </button>
+          <button
+            onClick={handleStudentLink}
+            disabled={isTyping}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-[rgba(94,228,240,0.1)] text-[#5ee4f0] border border-[rgba(94,228,240,0.18)] hover:bg-[rgba(94,228,240,0.18)] transition-colors cursor-pointer disabled:opacity-40"
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            同门关联
+          </button>
+          <button
+            onClick={handleDeepRead}
+            disabled={isTyping}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-[rgba(52,211,153,0.1)] text-emerald-300 border border-[rgba(52,211,153,0.18)] hover:bg-[rgba(52,211,153,0.18)] transition-colors cursor-pointer disabled:opacity-40"
+          >
+            <BookMarked className="w-3.5 h-3.5" />
+            文献精读
+          </button>
+        </div>
+      )}
+
+      {/* 消息列表 */}
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
         {!hasPaper ? (
           <div className="h-full flex flex-col items-center justify-center text-center">
@@ -172,8 +220,9 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
               <Sparkles className="w-9 h-9 text-[#c49bff]" />
             </div>
             <p className="text-[15px] text-[#a898c4] font-medium">文献已加载，开始提问吧</p>
+            <p className="text-[13px] text-[#7a6a9a] mt-2">或使用上方快捷按钮进行画像评估、同门关联、文献精读</p>
             {activeStudent && (
-              <p className="text-[13px] text-[#5ee4f0] mt-3">已关联同门：{activeStudent.name}，脑师将结合其研究方向作答</p>
+              <p className="text-[13px] text-[#5ee4f0] mt-3">已关联同门：{activeStudent.name}</p>
             )}
           </div>
         ) : (
@@ -188,7 +237,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                 onMouseEnter={() => setHoveredMsgIdx(idx)}
                 onMouseLeave={() => setHoveredMsgIdx(null)}
               >
-                {/* 头像 - 更大 */}
+                {/* 头像 */}
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-1 ${
                   isUser
                     ? 'bg-gradient-to-br from-[#7ab8ff]/30 to-[#5ee4f0]/30 border border-[rgba(122,184,255,0.2)]'
@@ -201,7 +250,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                   )}
                 </div>
 
-                {/* 气泡 + 操作栏 - 更宽 */}
+                {/* 气泡 + 操作栏 */}
                 <div className={`max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                   <div
                     className={`rounded-2xl px-5 py-4 text-[15px] leading-relaxed relative ${
@@ -291,7 +340,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 输入区 - 更大更醒目 */}
+      {/* 输入区 */}
       <div className="px-6 py-4 border-t border-[rgba(255,255,255,0.1)]">
         <div className="glass-card rounded-2xl flex items-end gap-3 p-3">
           <textarea

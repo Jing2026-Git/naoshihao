@@ -28,9 +28,8 @@ import {
 // ── 思维模型标签配置 ──────────────────────────────────────────────
 const THINKING_MODELS = [
   { name: '苏格拉底诘问法', color: 'bg-[rgba(251,191,36,0.15)] text-amber-300 border-[rgba(251,191,36,0.3)]' },
-  { name: '第一性原理', color: 'bg-[rgba(52,211,153,0.15)] text-emerald-300 border-[rgba(52,211,153,0.3)]' },
   { name: '布鲁姆认知金字塔', color: 'bg-[rgba(122,184,255,0.18)] text-blue-300 border-[rgba(96,165,250,0.3)]' },
-  { name: '水平思考法', color: 'bg-[rgba(196,155,255,0.18)] text-purple-300 border-[rgba(196,155,255,0.32)]' },
+  { name: '文献精读', color: 'bg-[rgba(52,211,153,0.15)] text-emerald-300 border-[rgba(52,211,153,0.3)]' },
 ]
 
 /**
@@ -287,7 +286,7 @@ export default function App() {
 
   // ── 发送消息处理 ────────────────────────────────────────────────
   const handleSendMessage = useCallback(
-    async (text) => {
+    async (text, options = {}) => {
       const userMessage = {
         role: 'user',
         content: text,
@@ -312,6 +311,8 @@ export default function App() {
           paperContent: currentPaper?.textContent || '',
           labProfile,
           studentProfile: activeStudent || null,
+          includeProfile: options.includeProfile || false,
+          deepReadMode: options.deepReadMode || false,
         })
 
         const chatMessages = [

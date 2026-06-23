@@ -1,9 +1,9 @@
-import { getSettings, FREE_MODEL_CONFIG } from '../db.js';
+import { getSettings, FREE_MODEL_PROVIDERS } from '../db.js';
 
 /**
  * 脑师好 - AI API 服务模块
- * 支持两种模式：
- * 1. 免费模型（Pollinations.AI，无需 API Key）
+ * 支持三种模式：
+ * 1. 免费模型（SiliconFlow / Pollinations.AI）
  * 2. 自定义 API（OpenAI 兼容格式，用户自带 Key）
  */
 
@@ -15,16 +15,29 @@ function isFreeModel(settings) {
 }
 
 /**
+ * 获取当前免费模型配置
+ */
+function getFreeProvider(settings) {
+  const providerId = settings?.freeProviderId;
+  if (providerId) {
+    const found = FREE_MODEL_PROVIDERS.find(p => p.id === providerId);
+    if (found) return found;
+  }
+  return FREE_MODEL_PROVIDERS[0];
+}
+
+/**
  * 构建请求参数
  */
 function buildRequestConfig(messages, options, settings, stream) {
   const isFree = isFreeModel(settings);
 
   if (isFree) {
-    // 免费模型：Pollinations.AI OpenAI 兼容端点
-    const url = FREE_MODEL_CONFIG.apiUrl;
+    const provider = getFreeProvider(settings);
+    const baseUrl = provider.apiUrl.replace(/\/+$/, '');
+    const url = `${baseUrl}/chat/completions`;
     const body = {
-      model: options.modelName || FREE_MODEL_CONFIG.modelName,
+      model: options.modelName || provider.modelName,
       messages,
       stream,
       temperature: options.temperature ?? 0.7,
@@ -32,7 +45,11 @@ function buildRequestConfig(messages, options, settings, stream) {
     };
     return {
       url,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        // SiliconFlow 需要 Authorization header，但不需要 key（免费模型）
+        ...(provider.id === 'siliconflow' ? { 'Authorization': 'Bearer free' } : {}),
+      },
       body,
     };
   }
@@ -95,16 +112,31 @@ async function handleErrorResponse(response) {
 }
 
 /**
- * 流式调用 AI 接口
- * 返回一个异步生成器，逐步产出文本片段
- *
- * @param {Array<{role: string, content: string}>} messages - 消息列表
- * @param {Object} [options] - 可选参数
- * @param {string} [options.modelName] - 覆盖设置中的模型名称
- * @param {number} [options.temperature] - 温度参数
- * @param {number} [options.maxTokens] - 最大 token 数
- * @yields {string} 文本片段
- * @returns {AsyncGenerator<string>}
+ * 带重试的 fetch
+ */
+async function fetchWithRetry(url, options, maxRetries = 2) {
+  let lastError;
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      // 4xx 错误不重试
+      if (response.status >= 400 && response.status < 500) {
+        await handleErrorResponse(response);
+      }
+      lastError = new Error(`HTTP ${response.status}`);
+    } catch (err) {
+      lastError = err;
+    }
+    if (i < maxRetries) {
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * 流式调用 AI 接口（带自动重试）
  */
 export async function* callAI(messages, options = {}) {
   const settings = await getSettings();
@@ -120,20 +152,11 @@ export async function* callAI(messages, options = {}) {
 
   const config = buildRequestConfig(messages, options, settings, true);
 
-  let response;
-  try {
-    response = await fetch(config.url, {
-      method: 'POST',
-      headers: config.headers,
-      body: JSON.stringify(config.body),
-    });
-  } catch (networkError) {
-    throw new Error(`网络请求失败，请检查网络连接：${networkError.message}`);
-  }
-
-  if (!response.ok) {
-    await handleErrorResponse(response);
-  }
+  const response = await fetchWithRetry(config.url, {
+    method: 'POST',
+    headers: config.headers,
+    body: JSON.stringify(config.body),
+  });
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -172,15 +195,7 @@ export async function* callAI(messages, options = {}) {
 }
 
 /**
- * 非流式调用 AI 接口
- * 等待完整响应后一次性返回
- *
- * @param {Array<{role: string, content: string}>} messages - 消息列表
- * @param {Object} [options] - 可选参数
- * @param {string} [options.modelName] - 覆盖设置中的模型名称
- * @param {number} [options.temperature] - 温度参数
- * @param {number} [options.maxTokens] - 最大 token 数
- * @returns {Promise<string>} 完整的回复文本
+ * 非流式调用 AI 接口（带自动重试）
  */
 export async function callAINonStream(messages, options = {}) {
   const settings = await getSettings();
@@ -196,20 +211,11 @@ export async function callAINonStream(messages, options = {}) {
 
   const config = buildRequestConfig(messages, options, settings, false);
 
-  let response;
-  try {
-    response = await fetch(config.url, {
-      method: 'POST',
-      headers: config.headers,
-      body: JSON.stringify(config.body),
-    });
-  } catch (networkError) {
-    throw new Error(`网络请求失败，请检查网络连接：${networkError.message}`);
-  }
-
-  if (!response.ok) {
-    await handleErrorResponse(response);
-  }
+  const response = await fetchWithRetry(config.url, {
+    method: 'POST',
+    headers: config.headers,
+    body: JSON.stringify(config.body),
+  });
 
   try {
     const data = await response.json();
