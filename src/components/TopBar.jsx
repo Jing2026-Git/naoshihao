@@ -49,20 +49,20 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
           </div>
           <div>
             <h1 className="text-base font-bold gradient-text tracking-tight">脑师好</h1>
-            <p className="text-[10px] text-[#6b6b7b] -mt-0.5">认知神经科学文献阅读助手</p>
+            <p className="text-[10px] text-[#a898c4] -mt-0.5">认知神经科学文献阅读助手</p>
           </div>
         </div>
 
         {/* 配置栏 */}
         <div className="flex items-center gap-3 flex-1 mx-6">
           {/* 模式切换 */}
-          <div className="flex items-center bg-[#1a1a24] rounded-lg p-0.5 border border-[rgba(255,255,255,0.06)] shrink-0">
+          <div className="flex items-center bg-[#1a1a24] rounded-lg p-0.5 border border-[rgba(255,255,255,0.1)] shrink-0">
             <button
               onClick={() => setMode('free')}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 mode === 'free'
                   ? 'bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white'
-                  : 'text-[#6b6b7b] hover:text-[#a0a0b0]'
+                  : 'text-[#a898c4] hover:text-[#d4c8e8]'
               }`}
             >
               免费模型
@@ -72,7 +72,7 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 mode === 'custom'
                   ? 'bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white'
-                  : 'text-[#6b6b7b] hover:text-[#a0a0b0]'
+                  : 'text-[#a898c4] hover:text-[#d4c8e8]'
               }`}
             >
               自定义模型
@@ -93,13 +93,13 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
                 <option value="gemini">Pollinations Gemini</option>
                 <option value="deepseek">Pollinations DeepSeek</option>
               </select>
-              <Sparkles className="w-3.5 h-3.5 text-[#a78bfa] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Sparkles className="w-3.5 h-3.5 text-[#c49bff] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           ) : (
             /* 自定义模型输入 */
             <>
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Globe className="w-4 h-4 text-[#6b6b7b] shrink-0" />
+                <Globe className="w-4 h-4 text-[#a898c4] shrink-0" />
                 <input
                   type="url"
                   value={apiUrl}
@@ -109,7 +109,7 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
                 />
               </div>
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <KeyRound className="w-4 h-4 text-[#6b6b7b] shrink-0" />
+                <KeyRound className="w-4 h-4 text-[#a898c4] shrink-0" />
                 <input
                   type="password"
                   value={apiKey}
@@ -155,7 +155,7 @@ export default function TopBar({ onOpenLabProfile, hasLabProfile }) {
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onOpenLabProfile}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[#a0a0b0] hover:text-[#e8e8ef] hover:bg-[rgba(255,255,255,0.05)] transition-all cursor-pointer relative"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[#d4c8e8] hover:text-[#f5f0ff] hover:bg-[rgba(255,255,255,0.05)] transition-all cursor-pointer relative"
           >
             <FlaskConical className="w-4 h-4" />
             <span>脑师画像</span>

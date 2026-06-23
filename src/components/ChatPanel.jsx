@@ -73,14 +73,14 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* 标题栏 */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">
-            <Brain className="w-4 h-4 text-[#a78bfa]" />
+            <Brain className="w-4 h-4 text-[#c49bff]" />
           </div>
-          <span className="text-sm font-medium text-[#e8e8ef]">脑师说</span>
+          <span className="text-sm font-medium text-[#f5f0ff]">脑师说</span>
           {hasPaper && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.15)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(196,155,255,0.18)] text-[#c49bff] border border-[rgba(196,155,255,0.22)]">
               已加载文献
             </span>
           )}
@@ -93,8 +93,8 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
               onClick={() => setShowStudentDropdown(!showStudentDropdown)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 activeStudentId
-                  ? 'bg-[rgba(34,211,238,0.12)] text-[#22d3ee] border border-[rgba(34,211,238,0.2)]'
-                  : 'bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] border border-[rgba(255,255,255,0.08)] hover:text-[#a0a0b0]'
+                  ? 'bg-[rgba(94,228,240,0.15)] text-[#5ee4f0] border border-[rgba(94,228,240,0.22)]'
+                  : 'bg-[rgba(255,255,255,0.05)] text-[#a898c4] border border-[rgba(255,255,255,0.12)] hover:text-[#d4c8e8]'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -104,13 +104,13 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
 
             {showStudentDropdown && (
               <div className="absolute right-0 top-full mt-1.5 w-48 glass-card-strong rounded-xl overflow-hidden z-50 animate-fade-in-scale">
-                <div className="px-3 py-2 border-b border-[rgba(255,255,255,0.06)]">
-                  <p className="text-[10px] text-[#6b6b7b] uppercase tracking-wider">关联同门画像</p>
+                <div className="px-3 py-2 border-b border-[rgba(255,255,255,0.1)]">
+                  <p className="text-[10px] text-[#a898c4] uppercase tracking-wider">关联同门画像</p>
                 </div>
                 <button
                   onClick={() => { onSelectStudent(null); setShowStudentDropdown(false); }}
                   className={`w-full text-left px-3 py-2.5 text-xs transition-colors cursor-pointer flex items-center gap-2 ${
-                    !activeStudentId ? 'bg-[rgba(167,139,250,0.1)] text-[#a78bfa]' : 'text-[#a0a0b0] hover:bg-[rgba(255,255,255,0.03)]'
+                    !activeStudentId ? 'bg-[rgba(196,155,255,0.12)] text-[#c49bff]' : 'text-[#d4c8e8] hover:bg-[rgba(255,255,255,0.03)]'
                   }`}
                 >
                   <span className="w-5 h-5 rounded-full bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-[10px]">无</span>
@@ -121,7 +121,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                     key={student.id}
                     onClick={() => { onSelectStudent(student.id); setShowStudentDropdown(false); }}
                     className={`w-full text-left px-3 py-2.5 text-xs transition-colors cursor-pointer flex items-center gap-2 ${
-                      activeStudentId === student.id ? 'bg-[rgba(34,211,238,0.1)] text-[#22d3ee]' : 'text-[#a0a0b0] hover:bg-[rgba(255,255,255,0.03)]'
+                      activeStudentId === student.id ? 'bg-[rgba(94,228,240,0.12)] text-[#5ee4f0]' : 'text-[#d4c8e8] hover:bg-[rgba(255,255,255,0.03)]'
                     }`}
                   >
                     <User className="w-3.5 h-3.5" />
@@ -136,17 +136,17 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
 
       {/* 关联提示条 */}
       {activeStudent && hasPaper && (
-        <div className="px-5 py-2 bg-[rgba(34,211,238,0.05)] border-b border-[rgba(34,211,238,0.08)] flex items-center gap-2">
-          <Users className="w-3 h-3 text-[#22d3ee]" />
-          <span className="text-[11px] text-[#22d3ee]">
+        <div className="px-5 py-2 bg-[rgba(34,211,238,0.05)] border-b border-[rgba(94,228,240,0.12)] flex items-center gap-2">
+          <Users className="w-3 h-3 text-[#5ee4f0]" />
+          <span className="text-[11px] text-[#5ee4f0]">
             当前对话关联同门：<span className="font-medium">{activeStudent.name}</span>
             {activeStudent.description && (
-              <span className="text-[#6b6b7b] ml-1">· {activeStudent.description.slice(0, 30)}{activeStudent.description.length > 30 ? '...' : ''}</span>
+              <span className="text-[#a898c4] ml-1">· {activeStudent.description.slice(0, 30)}{activeStudent.description.length > 30 ? '...' : ''}</span>
             )}
           </span>
           <button
             onClick={() => onSelectStudent(null)}
-            className="ml-auto p-0.5 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer"
+            className="ml-auto p-0.5 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#a898c4] hover:text-[#f5f0ff] cursor-pointer"
           >
             <X className="w-3 h-3" />
           </button>
@@ -157,22 +157,22 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         {!hasPaper ? (
           <div className="h-full flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#a78bfa]/10 to-[#60a5fa]/10 flex items-center justify-center mb-5 border border-[rgba(167,139,250,0.15)] animate-glow-pulse">
-              <BookOpen className="w-10 h-10 text-[#a78bfa]" />
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#a78bfa]/10 to-[#60a5fa]/10 flex items-center justify-center mb-5 border border-[rgba(196,155,255,0.18)] animate-glow-pulse">
+              <BookOpen className="w-10 h-10 text-[#c49bff]" />
             </div>
-            <h3 className="text-lg font-semibold text-[#e8e8ef] mb-2">欢迎使用脑师好</h3>
-            <p className="text-sm text-[#6b6b7b] max-w-xs leading-relaxed">
+            <h3 className="text-lg font-semibold text-[#f5f0ff] mb-2">欢迎使用脑师好</h3>
+            <p className="text-sm text-[#a898c4] max-w-xs leading-relaxed">
               在左侧上传一篇学术文献，脑师将基于苏格拉底学习法为您深度解读
             </p>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#a78bfa]/10 to-[#60a5fa]/10 flex items-center justify-center mb-4 border border-[rgba(167,139,250,0.15)]">
-              <Sparkles className="w-7 h-7 text-[#a78bfa]" />
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#a78bfa]/10 to-[#60a5fa]/10 flex items-center justify-center mb-4 border border-[rgba(196,155,255,0.18)]">
+              <Sparkles className="w-7 h-7 text-[#c49bff]" />
             </div>
-            <p className="text-sm text-[#6b6b7b]">文献已加载，开始提问吧</p>
+            <p className="text-sm text-[#a898c4]">文献已加载，开始提问吧</p>
             {activeStudent && (
-              <p className="text-xs text-[#22d3ee] mt-2">已关联同门：{activeStudent.name}，脑师将结合其研究方向作答</p>
+              <p className="text-xs text-[#5ee4f0] mt-2">已关联同门：{activeStudent.name}，脑师将结合其研究方向作答</p>
             )}
           </div>
         ) : (
@@ -194,9 +194,9 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                     : 'bg-gradient-to-br from-[#a78bfa]/30 to-[#c084fc]/30'
                 }`}>
                   {isUser ? (
-                    <User className="w-3.5 h-3.5 text-[#60a5fa]" />
+                    <User className="w-3.5 h-3.5 text-[#7ab8ff]" />
                   ) : (
-                    <Brain className="w-3.5 h-3.5 text-[#a78bfa]" />
+                    <Brain className="w-3.5 h-3.5 text-[#c49bff]" />
                   )}
                 </div>
 
@@ -205,8 +205,8 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                   <div
                     className={`rounded-2xl px-4 py-3 text-sm leading-relaxed relative ${
                       isUser
-                        ? 'bg-[rgba(96,165,250,0.12)] border border-[rgba(96,165,250,0.15)] text-[#e8e8ef]'
-                        : 'bg-[rgba(167,139,250,0.08)] border border-[rgba(167,139,250,0.12)] text-[#a0a0b0]'
+                        ? 'bg-[rgba(122,184,255,0.15)] border border-[rgba(122,184,255,0.18)] text-[#f5f0ff]'
+                        : 'bg-[rgba(167,139,250,0.08)] border border-[rgba(196,155,255,0.15)] text-[#d4c8e8]'
                     }`}
                   >
                     {isUser ? (
@@ -225,7 +225,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                     {/* 复制按钮 */}
                     <button
                       onClick={() => handleCopy(msg.content, idx)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#6b6b7b] hover:text-[#a0a0b0] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#a898c4] hover:text-[#d4c8e8] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
                       title="复制"
                     >
                       {copiedIdx === idx ? (
@@ -244,7 +244,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                     {/* 删除按钮 */}
                     <button
                       onClick={() => handleDelete(idx)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#6b6b7b] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors cursor-pointer"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#a898c4] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors cursor-pointer"
                       title="删除"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -255,7 +255,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                     {!isUser && isLastAssistant && (
                       <button
                         onClick={() => handleRegenerate(idx)}
-                        className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#6b6b7b] hover:text-[#a78bfa] hover:bg-[rgba(167,139,250,0.08)] transition-colors cursor-pointer"
+                        className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#a898c4] hover:text-[#c49bff] hover:bg-[rgba(167,139,250,0.08)] transition-colors cursor-pointer"
                         title="重新生成"
                       >
                         <RotateCcw className="w-3 h-3" />
@@ -267,8 +267,8 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
                   {/* 思维模型标签 */}
                   {!isUser && msg.modelLabel && (
                     <div className="flex items-center gap-1.5 mt-1 px-1">
-                      <Sparkles className="w-3 h-3 text-[#a78bfa]" />
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${msg.colorClass || 'bg-[rgba(167,139,250,0.1)] text-[#a78bfa] border-[rgba(167,139,250,0.2)]'}`}>
+                      <Sparkles className="w-3 h-3 text-[#c49bff]" />
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${msg.colorClass || 'bg-[rgba(196,155,255,0.12)] text-[#c49bff] border-[rgba(196,155,255,0.22)]'}`}>
                         {msg.modelLabel}
                       </span>
                     </div>
@@ -282,9 +282,9 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
         {isTyping && (
           <div className="flex gap-3 animate-fade-in">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/30 to-[#c084fc]/30 flex items-center justify-center">
-              <Brain className="w-3.5 h-3.5 text-[#a78bfa]" />
+              <Brain className="w-3.5 h-3.5 text-[#c49bff]" />
             </div>
-            <div className="bg-[rgba(167,139,250,0.08)] border border-[rgba(167,139,250,0.12)] rounded-2xl px-4 py-3">
+            <div className="bg-[rgba(167,139,250,0.08)] border border-[rgba(196,155,255,0.15)] rounded-2xl px-4 py-3">
               <TypingIndicator />
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
       </div>
 
       {/* 输入区 */}
-      <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.06)]">
+      <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.1)]">
         <div className="glass-card rounded-xl flex items-end gap-2 p-2">
           <textarea
             ref={inputRef}
@@ -304,7 +304,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
             placeholder={hasPaper ? "向脑师提问..." : "请先上传文献"}
             disabled={!hasPaper}
             rows={1}
-            className="flex-1 bg-transparent border-none text-sm text-[#e8e8ef] placeholder:text-[#4a4a5a] resize-none py-2 px-2 focus:outline-none max-h-32 disabled:opacity-40"
+            className="flex-1 bg-transparent border-none text-sm text-[#f5f0ff] placeholder:text-[#7a6a9a] resize-none py-2 px-2 focus:outline-none max-h-32 disabled:opacity-40"
             style={{ minHeight: '36px' }}
           />
           <button
@@ -315,7 +315,7 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, hasPaper,
             <Send className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-[10px] text-[#4a4a5a] mt-1.5 text-center">
+        <p className="text-[10px] text-[#7a6a9a] mt-1.5 text-center">
           Enter 发送 · Shift+Enter 换行
         </p>
       </div>

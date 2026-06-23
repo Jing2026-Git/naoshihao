@@ -222,18 +222,18 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
     <>
       <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-lg bg-[rgba(20,12,40,0.95)] backdrop-blur-xl shadow-2xl animate-slide-in-right flex flex-col border-l border-[rgba(167,139,250,0.12)]">
+      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-lg bg-[rgba(20,12,40,0.95)] backdrop-blur-xl shadow-2xl animate-slide-in-right flex flex-col border-l border-[rgba(196,155,255,0.15)]">
         {/* 标题栏 */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(255,255,255,0.06)] shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(255,255,255,0.1)] shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center">
-              <FlaskConical className="w-4 h-4 text-[#a78bfa]" />
+              <FlaskConical className="w-4 h-4 text-[#c49bff]" />
             </div>
-            <h2 className="text-base font-semibold text-[#e8e8ef]">脑师画像</h2>
+            <h2 className="text-base font-semibold text-[#f5f0ff]">脑师画像</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#6b6b7b] hover:text-[#e8e8ef] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[#a898c4] hover:text-[#f5f0ff] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -246,7 +246,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
               activeTab === 'lab'
                 ? 'bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white'
-                : 'text-[#6b6b7b] hover:text-[#a0a0b0]'
+                : 'text-[#a898c4] hover:text-[#d4c8e8]'
             }`}
           >
             <span className="flex items-center gap-1.5">
@@ -259,14 +259,14 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
               activeTab === 'students'
                 ? 'bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] text-white'
-                : 'text-[#6b6b7b] hover:text-[#a0a0b0]'
+                : 'text-[#a898c4] hover:text-[#d4c8e8]'
             }`}
           >
             <span className="flex items-center gap-1.5">
               <GraduationCap className="w-3.5 h-3.5" />
               同门画像
               {students.length > 0 && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(167,139,250,0.3)]">{students.length}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(196,155,255,0.32)]">{students.length}</span>
               )}
             </span>
           </button>
@@ -280,18 +280,18 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               {isGenerating ? (
                 <div className="flex flex-col items-center justify-center py-16">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center mb-4">
-                    <Loader2 className="w-6 h-6 text-[#a78bfa] animate-spin" />
+                    <Loader2 className="w-6 h-6 text-[#c49bff] animate-spin" />
                   </div>
-                  <p className="text-sm text-[#6b6b7b]">正在分析文献，生成脑师画像...</p>
+                  <p className="text-sm text-[#a898c4]">正在分析文献，生成脑师画像...</p>
                 </div>
               ) : isEditing && editData ? (
                 /* 编辑模式 */
                 <div className="space-y-4 animate-fade-in">
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <Tag className="w-4 h-4 text-[#a78bfa]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">研究方向</h3>
-                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                      <Tag className="w-4 h-4 text-[#c49bff]" />
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">研究方向</h3>
+                      <span className="text-[10px] text-[#a898c4]">每行一个</span>
                     </div>
                     <textarea
                       value={editData.directions}
@@ -303,8 +303,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <BookOpen className="w-4 h-4 text-[#60a5fa]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">文献类型偏好</h3>
+                      <BookOpen className="w-4 h-4 text-[#7ab8ff]" />
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">文献类型偏好</h3>
                     </div>
                     <textarea
                       value={editData.literatureTypes}
@@ -316,8 +316,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">典型研究问题</h3>
+                      <CircleHelp className="w-4 h-4 text-[#5ee4f0]" />
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">典型研究问题</h3>
                     </div>
                     <textarea
                       value={editData.researchQuestions}
@@ -329,8 +329,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <Beaker className="w-4 h-4 text-[#a78bfa]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">关键技术手段</h3>
+                      <Beaker className="w-4 h-4 text-[#c49bff]" />
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">关键技术手段</h3>
                     </div>
                     <textarea
                       value={editData.techniques}
@@ -343,8 +343,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <BookOpen className="w-4 h-4 text-[#f59e0b]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">期刊质量偏好</h3>
-                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">期刊质量偏好</h3>
+                      <span className="text-[10px] text-[#a898c4]">每行一个</span>
                     </div>
                     <textarea
                       value={editData.journalQuality}
@@ -357,8 +357,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Tag className="w-4 h-4 text-[#ec4899]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">研究范式偏好</h3>
-                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">研究范式偏好</h3>
+                      <span className="text-[10px] text-[#a898c4]">每行一个</span>
                     </div>
                     <textarea
                       value={editData.researchParadigm}
@@ -370,9 +370,9 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
                   <div className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
-                      <h3 className="text-sm font-semibold text-[#e8e8ef]">文献质量标准</h3>
-                      <span className="text-[10px] text-[#6b6b7b]">每行一个</span>
+                      <CircleHelp className="w-4 h-4 text-[#5ee4f0]" />
+                      <h3 className="text-sm font-semibold text-[#f5f0ff]">文献质量标准</h3>
+                      <span className="text-[10px] text-[#a898c4]">每行一个</span>
                     </div>
                     <textarea
                       value={editData.qualityStandards}
@@ -392,7 +392,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     </button>
                     <button
                       onClick={() => { setIsEditing(false); setEditData(null); }}
-                      className="px-4 py-2.5 rounded-xl text-sm font-medium border border-[rgba(255,255,255,0.1)] text-[#a0a0b0] hover:text-[#e8e8ef] cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl text-sm font-medium border border-[rgba(255,255,255,0.1)] text-[#d4c8e8] hover:text-[#f5f0ff] cursor-pointer"
                     >
                       取消
                     </button>
@@ -401,24 +401,24 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               ) : !profile ? (
                 /* 无画像 - 导入 */
                 <div className="space-y-4">
-                  <p className="text-sm text-[#6b6b7b] leading-relaxed">
+                  <p className="text-sm text-[#a898c4] leading-relaxed">
                     尚未创建课题组画像。请通过以下方式导入文献信息，系统将自动生成画像。
                   </p>
 
                   <button
                     onClick={() => handleImportClick('.csv,.xlsx,.xls')}
-                    className="w-full glass-card rounded-xl p-5 text-left hover:border-[rgba(167,139,250,0.3)] transition-all cursor-pointer group"
+                    className="w-full glass-card rounded-xl p-5 text-left hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer group"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#a78bfa]/15 to-[#c084fc]/15 flex items-center justify-center shrink-0 border border-[rgba(167,139,250,0.15)]">
-                        <FileSpreadsheet className="w-5 h-5 text-[#a78bfa]" />
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#a78bfa]/15 to-[#c084fc]/15 flex items-center justify-center shrink-0 border border-[rgba(196,155,255,0.18)]">
+                        <FileSpreadsheet className="w-5 h-5 text-[#c49bff]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold text-[#e8e8ef]">上传文献清单</h3>
-                          <ChevronRight className="w-4 h-4 text-[#4a4a5a] group-hover:text-[#a78bfa] transition-colors" />
+                          <h3 className="text-sm font-semibold text-[#f5f0ff]">上传文献清单</h3>
+                          <ChevronRight className="w-4 h-4 text-[#7a6a9a] group-hover:text-[#c49bff] transition-colors" />
                         </div>
-                        <p className="mt-1 text-xs text-[#6b6b7b] leading-relaxed">
+                        <p className="mt-1 text-xs text-[#a898c4] leading-relaxed">
                           支持 CSV 格式，包含标题、作者、摘要等字段。
                         </p>
                       </div>
@@ -430,15 +430,15 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     className="w-full glass-card rounded-xl p-5 text-left hover:border-[rgba(96,165,250,0.3)] transition-all cursor-pointer group"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#60a5fa]/15 to-[#22d3ee]/15 flex items-center justify-center shrink-0 border border-[rgba(96,165,250,0.15)]">
-                        <FileText className="w-5 h-5 text-[#60a5fa]" />
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#60a5fa]/15 to-[#22d3ee]/15 flex items-center justify-center shrink-0 border border-[rgba(122,184,255,0.18)]">
+                        <FileText className="w-5 h-5 text-[#7ab8ff]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold text-[#e8e8ef]">上传典型文献</h3>
-                          <ChevronRight className="w-4 h-4 text-[#4a4a5a] group-hover:text-[#60a5fa] transition-colors" />
+                          <h3 className="text-sm font-semibold text-[#f5f0ff]">上传典型文献</h3>
+                          <ChevronRight className="w-4 h-4 text-[#7a6a9a] group-hover:text-[#7ab8ff] transition-colors" />
                         </div>
-                        <p className="mt-1 text-xs text-[#6b6b7b] leading-relaxed">
+                        <p className="mt-1 text-xs text-[#a898c4] leading-relaxed">
                           支持多篇 PDF，系统将深入分析内容。
                         </p>
                       </div>
@@ -453,12 +453,12 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   {profile.directions?.length > 0 && (
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <Tag className="w-4 h-4 text-[#a78bfa]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">研究方向</h3>
+                        <Tag className="w-4 h-4 text-[#c49bff]" />
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">研究方向</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {profile.directions.map((dir, idx) => (
-                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(167,139,250,0.12)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]">{dir}</span>
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(196,155,255,0.15)] text-[#c49bff] border border-[rgba(196,155,255,0.22)]">{dir}</span>
                         ))}
                       </div>
                     </div>
@@ -467,12 +467,12 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   {profile.literatureTypes?.length > 0 && (
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <BookOpen className="w-4 h-4 text-[#60a5fa]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">文献类型偏好</h3>
+                        <BookOpen className="w-4 h-4 text-[#7ab8ff]" />
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">文献类型偏好</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {profile.literatureTypes.map((type, idx) => (
-                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(96,165,250,0.12)] text-[#60a5fa] border border-[rgba(96,165,250,0.2)]">{type}</span>
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(122,184,255,0.15)] text-[#7ab8ff] border border-[rgba(122,184,255,0.22)]">{type}</span>
                         ))}
                       </div>
                     </div>
@@ -481,13 +481,13 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   {profile.researchQuestions?.length > 0 && (
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">典型研究问题</h3>
+                        <CircleHelp className="w-4 h-4 text-[#5ee4f0]" />
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">典型研究问题</h3>
                       </div>
                       <ul className="space-y-2">
                         {profile.researchQuestions.map((q, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-[#a0a0b0] leading-relaxed">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee] mt-1.5 shrink-0" />
+                          <li key={idx} className="flex items-start gap-2 text-sm text-[#d4c8e8] leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#5ee4f0] mt-1.5 shrink-0" />
                             {q}
                           </li>
                         ))}
@@ -498,12 +498,12 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   {profile.techniques?.length > 0 && (
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <Beaker className="w-4 h-4 text-[#a78bfa]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">关键技术手段</h3>
+                        <Beaker className="w-4 h-4 text-[#c49bff]" />
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">关键技术手段</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {profile.techniques.map((tech, idx) => (
-                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(255,255,255,0.05)] text-[#a0a0b0] border border-[rgba(255,255,255,0.08)]">{tech}</span>
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(255,255,255,0.05)] text-[#d4c8e8] border border-[rgba(255,255,255,0.12)]">{tech}</span>
                         ))}
                       </div>
                     </div>
@@ -513,7 +513,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <BookOpen className="w-4 h-4 text-[#f59e0b]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">期刊质量偏好</h3>
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">期刊质量偏好</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {profile.journalQuality.map((item, idx) => (
@@ -527,7 +527,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <Tag className="w-4 h-4 text-[#ec4899]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">研究范式偏好</h3>
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">研究范式偏好</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {profile.researchParadigm.map((item, idx) => (
@@ -540,12 +540,12 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   {profile.qualityStandards?.length > 0 && (
                     <div className="glass-card rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <CircleHelp className="w-4 h-4 text-[#22d3ee]" />
-                        <h3 className="text-sm font-semibold text-[#e8e8ef]">文献质量标准</h3>
+                        <CircleHelp className="w-4 h-4 text-[#5ee4f0]" />
+                        <h3 className="text-sm font-semibold text-[#f5f0ff]">文献质量标准</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {profile.qualityStandards.map((item, idx) => (
-                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(34,211,238,0.12)] text-[#22d3ee] border border-[rgba(34,211,238,0.2)]">{item}</span>
+                          <span key={idx} className="px-3 py-1 rounded-full text-xs font-medium bg-[rgba(94,228,240,0.15)] text-[#5ee4f0] border border-[rgba(94,228,240,0.22)]">{item}</span>
                         ))}
                       </div>
                     </div>
@@ -554,7 +554,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={handleStartEdit}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border border-[rgba(255,255,255,0.1)] text-[#a0a0b0] hover:text-[#e8e8ef] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border border-[rgba(255,255,255,0.1)] text-[#d4c8e8] hover:text-[#f5f0ff] hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer"
                     >
                       <Pencil className="w-4 h-4" />
                       编辑画像
@@ -575,7 +575,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
           {/* ========== 同门画像 Tab ========== */}
           {activeTab === 'students' && (
             <div className="space-y-4">
-              <p className="text-sm text-[#6b6b7b] leading-relaxed">
+              <p className="text-sm text-[#a898c4] leading-relaxed">
                 添加同门学生的研究方向或毕业论文，脑师将在对话中参考这些信息，提供更个性化的指导。
               </p>
 
@@ -583,27 +583,27 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
               {!showAddStudent ? (
                 <button
                   onClick={() => setShowAddStudent(true)}
-                  className="w-full glass-card rounded-xl p-4 flex items-center gap-3 hover:border-[rgba(167,139,250,0.3)] transition-all cursor-pointer"
+                  className="w-full glass-card rounded-xl p-4 flex items-center gap-3 hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#22d3ee]/15 to-[#60a5fa]/15 flex items-center justify-center shrink-0 border border-[rgba(34,211,238,0.15)]">
-                    <UserPlus className="w-5 h-5 text-[#22d3ee]" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#22d3ee]/15 to-[#60a5fa]/15 flex items-center justify-center shrink-0 border border-[rgba(94,228,240,0.18)]">
+                    <UserPlus className="w-5 h-5 text-[#5ee4f0]" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#e8e8ef]">添加同门画像</p>
-                    <p className="text-xs text-[#6b6b7b]">填写研究方向或上传论文文件</p>
+                    <p className="text-sm font-medium text-[#f5f0ff]">添加同门画像</p>
+                    <p className="text-xs text-[#a898c4]">填写研究方向或上传论文文件</p>
                   </div>
                 </button>
               ) : (
                 <div className="glass-card rounded-xl p-5 animate-fade-in-scale space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-[#e8e8ef]">{editingStudentId ? '编辑同门' : '添加同门'}</h3>
-                    <button onClick={() => { setShowAddStudent(false); setEditingStudentId(null); setNewStudent({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' }); }} className="text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer">
+                    <h3 className="text-sm font-semibold text-[#f5f0ff]">{editingStudentId ? '编辑同门' : '添加同门'}</h3>
+                    <button onClick={() => { setShowAddStudent(false); setEditingStudentId(null); setNewStudent({ name: '', description: '', projectName: '', projectStage: '', methodsOfInterest: '', writingStage: '' }); }} className="text-[#a898c4] hover:text-[#f5f0ff] cursor-pointer">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-xs text-[#6b6b7b] mb-1">姓名 *</label>
+                    <label className="block text-xs text-[#a898c4] mb-1">姓名 *</label>
                     <input
                       type="text"
                       value={newStudent.name}
@@ -614,7 +614,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   </div>
 
                   <div>
-                    <label className="block text-xs text-[#6b6b7b] mb-1">研究方向描述</label>
+                    <label className="block text-xs text-[#a898c4] mb-1">研究方向描述</label>
                     <textarea
                       value={newStudent.description}
                       onChange={(e) => setNewStudent({ ...newStudent, description: e.target.value })}
@@ -624,7 +624,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   </div>
 
                   <div>
-                    <label className="block text-xs text-[#6b6b7b] mb-1">当前课题项目</label>
+                    <label className="block text-xs text-[#a898c4] mb-1">当前课题项目</label>
                     <input
                       type="text"
                       value={newStudent.projectName}
@@ -636,7 +636,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-[#6b6b7b] mb-1">课题阶段</label>
+                      <label className="block text-xs text-[#a898c4] mb-1">课题阶段</label>
                       <select
                         value={newStudent.projectStage}
                         onChange={(e) => setNewStudent({ ...newStudent, projectStage: e.target.value })}
@@ -652,7 +652,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-[#6b6b7b] mb-1">论文撰写阶段</label>
+                      <label className="block text-xs text-[#a898c4] mb-1">论文撰写阶段</label>
                       <select
                         value={newStudent.writingStage}
                         onChange={(e) => setNewStudent({ ...newStudent, writingStage: e.target.value })}
@@ -671,7 +671,7 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   </div>
 
                   <div>
-                    <label className="block text-xs text-[#6b6b7b] mb-1">关注的方法/技术</label>
+                    <label className="block text-xs text-[#a898c4] mb-1">关注的方法/技术</label>
                     <input
                       type="text"
                       value={newStudent.methodsOfInterest}
@@ -682,13 +682,13 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                   </div>
 
                   <div>
-                    <label className="block text-xs text-[#6b6b7b] mb-1">或上传论文/文档（可选）</label>
+                    <label className="block text-xs text-[#a898c4] mb-1">或上传论文/文档（可选）</label>
                     <div
                       onClick={() => studentFileRef.current?.click()}
-                      className="glass-card rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-[rgba(167,139,250,0.3)] transition-all"
+                      className="glass-card rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-[rgba(196,155,255,0.32)] transition-all"
                     >
-                      <FileUp className="w-4 h-4 text-[#a78bfa]" />
-                      <span className="text-xs text-[#6b6b7b]">
+                      <FileUp className="w-4 h-4 text-[#c49bff]" />
+                      <span className="text-xs text-[#a898c4]">
                         {uploadingStudent ? '解析中...' : '点击上传 PDF 或 Word 文件'}
                       </span>
                     </div>
@@ -712,34 +712,34 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                     <div key={student.id} className="glass-card rounded-xl p-4 animate-fade-in">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3 flex-1 min-w-0">
-                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#22d3ee]/15 to-[#60a5fa]/15 flex items-center justify-center shrink-0 border border-[rgba(34,211,238,0.15)]">
-                            <GraduationCap className="w-4 h-4 text-[#22d3ee]" />
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#22d3ee]/15 to-[#60a5fa]/15 flex items-center justify-center shrink-0 border border-[rgba(94,228,240,0.18)]">
+                            <GraduationCap className="w-4 h-4 text-[#5ee4f0]" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-semibold text-[#e8e8ef]">{student.name}</h4>
+                              <h4 className="text-sm font-semibold text-[#f5f0ff]">{student.name}</h4>
                               {student.projectStage && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(34,211,238,0.12)] text-[#22d3ee] border border-[rgba(34,211,238,0.2)]">{student.projectStage}</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(94,228,240,0.15)] text-[#5ee4f0] border border-[rgba(94,228,240,0.22)]">{student.projectStage}</span>
                               )}
                             </div>
                             {student.projectName && (
-                              <p className="text-[11px] text-[#a78bfa] mt-0.5 truncate">{student.projectName}</p>
+                              <p className="text-[11px] text-[#c49bff] mt-0.5 truncate">{student.projectName}</p>
                             )}
                             {student.description && (
-                              <p className="text-xs text-[#a0a0b0] mt-1 leading-relaxed line-clamp-2">{student.description}</p>
+                              <p className="text-xs text-[#d4c8e8] mt-1 leading-relaxed line-clamp-2">{student.description}</p>
                             )}
                             <div className="flex flex-wrap gap-1.5 mt-1.5">
                               {student.methodsOfInterest && (
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(96,165,250,0.1)] text-[#60a5fa] border border-[rgba(96,165,250,0.15)]">{student.methodsOfInterest}</span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(96,165,250,0.1)] text-[#7ab8ff] border border-[rgba(122,184,255,0.18)]">{student.methodsOfInterest}</span>
                               )}
                               {student.writingStage && (
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.1)] text-[#a78bfa] border border-[rgba(167,139,250,0.15)]">撰写：{student.writingStage}</span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(196,155,255,0.12)] text-[#c49bff] border border-[rgba(196,155,255,0.18)]">撰写：{student.writingStage}</span>
                               )}
                             </div>
                             {student.fileName && (
                               <div className="flex items-center gap-1 mt-1.5">
-                                <FileText className="w-3 h-3 text-[#6b6b7b]" />
-                                <span className="text-[10px] text-[#6b6b7b] truncate">{student.fileName}</span>
+                                <FileText className="w-3 h-3 text-[#a898c4]" />
+                                <span className="text-[10px] text-[#a898c4] truncate">{student.fileName}</span>
                                 <CheckCircle className="w-3 h-3 text-emerald-400" />
                               </div>
                             )}
@@ -748,14 +748,14 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                         <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleStartEditStudent(student)}
-                      className="p-1.5 rounded-lg text-[#4a4a5a] hover:text-[#a78bfa] hover:bg-[rgba(167,139,250,0.1)] transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-[#7a6a9a] hover:text-[#c49bff] hover:bg-[rgba(196,155,255,0.12)] transition-colors cursor-pointer"
                       title="编辑"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteStudent(student.id)}
-                      className="p-1.5 rounded-lg text-[#4a4a5a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)] transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-[#7a6a9a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)] transition-colors cursor-pointer"
                       title="删除"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -764,46 +764,46 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
                       </div>
 
                       {/* 工作汇报区域 */}
-                      <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.06)]">
+                      <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.1)]">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-1.5">
-                            <ClipboardPaste className="w-3.5 h-3.5 text-[#a78bfa]" />
-                            <span className="text-xs font-medium text-[#a0a0b0]">工作汇报</span>
+                            <ClipboardPaste className="w-3.5 h-3.5 text-[#c49bff]" />
+                            <span className="text-xs font-medium text-[#d4c8e8]">工作汇报</span>
                           </div>
                           {student.reportFileName && student.reportCreatedAt && (
-                            <span className="text-[10px] text-[#4a4a5a]">
+                            <span className="text-[10px] text-[#7a6a9a]">
                               {new Date(student.reportCreatedAt).toLocaleDateString('zh-CN')}
                             </span>
                           )}
                         </div>
 
                         {student.reportContent ? (
-                          <div className="rounded-lg bg-[rgba(167,139,250,0.06)] border border-[rgba(167,139,250,0.1)] p-3">
+                          <div className="rounded-lg bg-[rgba(196,155,255,0.08)] border border-[rgba(196,155,255,0.12)] p-3">
                             <div className="flex items-center gap-1.5 mb-1.5">
                               <CheckCircle className="w-3 h-3 text-emerald-400" />
                               <span className="text-[10px] text-emerald-400">{student.reportFileName}</span>
                             </div>
-                            <p className="text-[11px] text-[#6b6b7b] leading-relaxed line-clamp-4">{student.reportContent.slice(0, 300)}</p>
+                            <p className="text-[11px] text-[#a898c4] leading-relaxed line-clamp-4">{student.reportContent.slice(0, 300)}</p>
                             {student.reportContent.length > 300 && (
-                              <span className="text-[10px] text-[#4a4a5a]">...（共 {student.reportContent.length} 字）</span>
+                              <span className="text-[10px] text-[#7a6a9a]">...（共 {student.reportContent.length} 字）</span>
                             )}
                           </div>
                         ) : (
-                          <p className="text-[11px] text-[#4a4a5a] mb-2">暂无工作汇报，上传后脑师将了解该同门的最新进展</p>
+                          <p className="text-[11px] text-[#7a6a9a] mb-2">暂无工作汇报，上传后脑师将了解该同门的最新进展</p>
                         )}
 
                         <div className="flex items-center gap-2 mt-2">
                           <button
                             onClick={() => reportFileRefs.current[student.id]?.click()}
                             disabled={uploadingReportId === student.id}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-[rgba(255,255,255,0.08)] text-[#6b6b7b] hover:text-[#a0a0b0] hover:border-[rgba(255,255,255,0.15)] transition-all cursor-pointer disabled:opacity-50"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-[rgba(255,255,255,0.12)] text-[#a898c4] hover:text-[#d4c8e8] hover:border-[rgba(255,255,255,0.15)] transition-all cursor-pointer disabled:opacity-50"
                           >
                             <Upload className="w-3 h-3" />
                             {uploadingReportId === student.id ? '解析中...' : '上传文件'}
                           </button>
                           <button
                             onClick={() => handleReportPaste(student.id)}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-[rgba(255,255,255,0.08)] text-[#6b6b7b] hover:text-[#a0a0b0] hover:border-[rgba(255,255,255,0.15)] transition-all cursor-pointer"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-[rgba(255,255,255,0.12)] text-[#a898c4] hover:text-[#d4c8e8] hover:border-[rgba(255,255,255,0.15)] transition-all cursor-pointer"
                           >
                             <ClipboardPaste className="w-3 h-3" />
                             粘贴文本
@@ -824,8 +824,8 @@ export default function LabProfilePanel({ isOpen, onClose, profile, onUpdate, on
 
               {students.length === 0 && !showAddStudent && (
                 <div className="text-center py-8">
-                  <GraduationCap className="w-10 h-10 text-[#4a4a5a] mx-auto mb-3" />
-                  <p className="text-sm text-[#6b6b7b]">还没有添加同门画像</p>
+                  <GraduationCap className="w-10 h-10 text-[#7a6a9a] mx-auto mb-3" />
+                  <p className="text-sm text-[#a898c4]">还没有添加同门画像</p>
                 </div>
               )}
             </div>

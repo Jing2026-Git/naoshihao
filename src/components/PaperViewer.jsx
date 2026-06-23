@@ -55,12 +55,12 @@ export default function PaperViewer({
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* 标题栏 */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.06)]">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-2">
-          <ScrollText className="w-4 h-4 text-[#a78bfa]" />
-          <span className="text-sm font-medium text-[#e8e8ef]">文献列表</span>
+          <ScrollText className="w-4 h-4 text-[#c49bff]" />
+          <span className="text-sm font-medium text-[#f5f0ff]">文献列表</span>
           {papers.length > 0 && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(167,139,250,0.15)] text-[#a78bfa] border border-[rgba(167,139,250,0.2)]">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(196,155,255,0.18)] text-[#c49bff] border border-[rgba(196,155,255,0.22)]">
               {papers.length}
             </span>
           )}
@@ -74,14 +74,14 @@ export default function PaperViewer({
             {/* 继续上传按钮 */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(167,139,250,0.3)] transition-all cursor-pointer group"
+              className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer group"
             >
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/15 to-[#60a5fa]/15 flex items-center justify-center border border-[rgba(167,139,250,0.15)]">
-                <Plus className="w-4 h-4 text-[#a78bfa]" />
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/15 to-[#60a5fa]/15 flex items-center justify-center border border-[rgba(196,155,255,0.18)]">
+                <Plus className="w-4 h-4 text-[#c49bff]" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-[#e8e8ef]">上传新文献</p>
-                <p className="text-[10px] text-[#6b6b7b]">PDF、Word 或粘贴文本</p>
+                <p className="text-sm font-medium text-[#f5f0ff]">上传新文献</p>
+                <p className="text-[10px] text-[#a898c4]">PDF、Word 或粘贴文本</p>
               </div>
               <input
                 ref={fileInputRef}
@@ -98,21 +98,21 @@ export default function PaperViewer({
                 onClick={() => setShowPaste(true)}
                 className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(34,211,238,0.3)] transition-all cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-lg bg-[rgba(34,211,238,0.1)] flex items-center justify-center">
-                  <ClipboardPaste className="w-4 h-4 text-[#22d3ee]" />
+                <div className="w-7 h-7 rounded-lg bg-[rgba(94,228,240,0.12)] flex items-center justify-center">
+                  <ClipboardPaste className="w-4 h-4 text-[#5ee4f0]" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-[#e8e8ef]">粘贴论文文本</p>
-                  <p className="text-[10px] text-[#6b6b7b]">直接粘贴论文内容</p>
+                  <p className="text-sm font-medium text-[#f5f0ff]">粘贴论文文本</p>
+                  <p className="text-[10px] text-[#a898c4]">直接粘贴论文内容</p>
                 </div>
               </button>
             ) : (
               <div className="glass-card rounded-xl p-4 animate-fade-in-scale">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-[#e8e8ef]">粘贴论文内容</span>
+                  <span className="text-sm font-medium text-[#f5f0ff]">粘贴论文内容</span>
                   <button
                     onClick={() => setShowPaste(false)}
-                    className="p-1 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer"
+                    className="p-1 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#a898c4] hover:text-[#f5f0ff] cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -133,29 +133,29 @@ export default function PaperViewer({
               </div>
             )}
 
-            <div className="h-px bg-[rgba(255,255,255,0.06)] my-2" />
+            <div className="h-px bg-[rgba(255,255,255,0.1)] my-2" />
 
             {papers.map((p) => (
               <div
                 key={p.id}
                 onClick={() => onSelectPaper(p)}
-                className={`glass-card rounded-lg p-3 cursor-pointer transition-all duration-200 hover:border-[rgba(167,139,250,0.3)] ${
+                className={`glass-card rounded-lg p-3 cursor-pointer transition-all duration-200 hover:border-[rgba(196,155,255,0.32)] ${
                   p.id === currentPaperId
-                    ? 'bg-[rgba(167,139,250,0.15)] border-[rgba(167,139,250,0.3)]'
+                    ? 'bg-[rgba(196,155,255,0.18)] border-[rgba(196,155,255,0.32)]'
                     : 'hover:bg-[rgba(255,255,255,0.02)]'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <FileText className="w-3 h-3 text-[#6b6b7b] shrink-0" />
-                      <p className="text-sm font-medium text-[#e8e8ef] truncate">{p.title}</p>
+                      <FileText className="w-3 h-3 text-[#a898c4] shrink-0" />
+                      <p className="text-sm font-medium text-[#f5f0ff] truncate">{p.title}</p>
                     </div>
-                    <p className="text-[10px] text-[#6b6b7b] mt-0.5 truncate">{p.fileName} · {new Date(p.uploadDate).toLocaleDateString('zh-CN')}</p>
+                    <p className="text-[10px] text-[#a898c4] mt-0.5 truncate">{p.fileName} · {new Date(p.uploadDate).toLocaleDateString('zh-CN')}</p>
                   </div>
                   <button
                     onClick={(e) => onDeletePaper(p.id, e)}
-                    className="p-1.5 rounded-md text-[#4a4a5a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors shrink-0"
+                    className="p-1.5 rounded-md text-[#7a6a9a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors shrink-0"
                     title="删除"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -173,14 +173,14 @@ export default function PaperViewer({
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`w-full max-w-md glass-card rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 ${
-                isDragOver ? 'drop-zone-active scale-[1.02]' : 'hover:border-[rgba(167,139,250,0.3)]'
+                isDragOver ? 'drop-zone-active scale-[1.02]' : 'hover:border-[rgba(196,155,255,0.32)]'
               }`}
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center mx-auto mb-4 border border-[rgba(167,139,250,0.2)]">
-                <FileUp className="w-8 h-8 text-[#a78bfa]" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center mx-auto mb-4 border border-[rgba(196,155,255,0.22)]">
+                <FileUp className="w-8 h-8 text-[#c49bff]" />
               </div>
-              <p className="text-[#e8e8ef] font-medium mb-1.5">拖拽文献到这里</p>
-              <p className="text-[#6b6b7b] text-sm mb-4">支持 PDF、Word 文档格式</p>
+              <p className="text-[#f5f0ff] font-medium mb-1.5">拖拽文献到这里</p>
+              <p className="text-[#a898c4] text-sm mb-4">支持 PDF、Word 文档格式</p>
               <button className="btn-secondary px-4 py-2 rounded-lg text-sm">
                 选择文件
               </button>
@@ -195,32 +195,32 @@ export default function PaperViewer({
 
             {/* 或 */}
             <div className="flex items-center gap-3 my-5 w-full max-w-md">
-              <div className="flex-1 h-px bg-[rgba(255,255,255,0.06)]" />
-              <span className="text-xs text-[#4a4a5a]">或</span>
-              <div className="flex-1 h-px bg-[rgba(255,255,255,0.06)]" />
+              <div className="flex-1 h-px bg-[rgba(255,255,255,0.1)]" />
+              <span className="text-xs text-[#7a6a9a]">或</span>
+              <div className="flex-1 h-px bg-[rgba(255,255,255,0.1)]" />
             </div>
 
             {/* 粘贴文本 */}
             {!showPaste ? (
               <button
                 onClick={(e) => { e.stopPropagation(); setShowPaste(true); }}
-                className="w-full max-w-md glass-card rounded-xl p-4 flex items-center gap-3 text-left hover:border-[rgba(167,139,250,0.3)] transition-all cursor-pointer"
+                className="w-full max-w-md glass-card rounded-xl p-4 flex items-center gap-3 text-left hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer"
               >
-                <div className="w-10 h-10 rounded-lg bg-[rgba(34,211,238,0.1)] flex items-center justify-center">
-                  <ClipboardPaste className="w-5 h-5 text-[#22d3ee]" />
+                <div className="w-10 h-10 rounded-lg bg-[rgba(94,228,240,0.12)] flex items-center justify-center">
+                  <ClipboardPaste className="w-5 h-5 text-[#5ee4f0]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-[#e8e8ef]">粘贴文本</p>
-                  <p className="text-xs text-[#6b6b7b]">直接粘贴论文内容</p>
+                  <p className="text-sm font-medium text-[#f5f0ff]">粘贴文本</p>
+                  <p className="text-xs text-[#a898c4]">直接粘贴论文内容</p>
                 </div>
               </button>
             ) : (
               <div className="w-full max-w-md glass-card rounded-xl p-4 animate-fade-in-scale">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-[#e8e8ef]">粘贴论文内容</span>
+                  <span className="text-sm font-medium text-[#f5f0ff]">粘贴论文内容</span>
                   <button
                     onClick={() => setShowPaste(false)}
-                    className="p-1 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#6b6b7b] hover:text-[#e8e8ef] cursor-pointer"
+                    className="p-1 rounded hover:bg-[rgba(255,255,255,0.05)] text-[#a898c4] hover:text-[#f5f0ff] cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -246,19 +246,19 @@ export default function PaperViewer({
 
       {/* 当前论文内容预览 */}
       {currentPaperId && paper && (
-        <div className="border-t border-[rgba(255,255,255,0.06)] flex-1 overflow-hidden relative min-h-[200px]">
+        <div className="border-t border-[rgba(255,255,255,0.1)] flex-1 overflow-hidden relative min-h-[200px]">
           {isLoading ? (
             <div className="h-full flex flex-col items-center justify-center">
-              <Loader2 className="w-8 h-8 text-[#a78bfa] animate-spin mb-3" />
-              <p className="text-sm text-[#6b6b7b]">正在解析文献...</p>
+              <Loader2 className="w-8 h-8 text-[#c49bff] animate-spin mb-3" />
+              <p className="text-sm text-[#a898c4]">正在解析文献...</p>
             </div>
           ) : (
             <div className="h-full overflow-y-auto p-3">
               <div className="glass-card rounded-xl p-4 animate-fade-in">
-                <div className="text-sm text-[#a0a0b0] leading-relaxed whitespace-pre-wrap font-mono text-[13px] max-h-[400px] overflow-y-auto">
+                <div className="text-sm text-[#d4c8e8] leading-relaxed whitespace-pre-wrap font-mono text-[13px] max-h-[400px] overflow-y-auto">
                   {paper.textContent.slice(0, 2000)}
                   {paper.textContent.length > 2000 && (
-                    <span className="text-[#4a4a5a] text-xs">...（已截取前2000字）</span>
+                    <span className="text-[#7a6a9a] text-xs">...（已截取前2000字）</span>
                   )}
                 </div>
               </div>

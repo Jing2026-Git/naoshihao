@@ -29,8 +29,8 @@ import {
 const THINKING_MODELS = [
   { name: '苏格拉底诘问法', color: 'bg-[rgba(251,191,36,0.15)] text-amber-300 border-[rgba(251,191,36,0.3)]' },
   { name: '第一性原理', color: 'bg-[rgba(52,211,153,0.15)] text-emerald-300 border-[rgba(52,211,153,0.3)]' },
-  { name: '布鲁姆认知金字塔', color: 'bg-[rgba(96,165,250,0.15)] text-blue-300 border-[rgba(96,165,250,0.3)]' },
-  { name: '水平思考法', color: 'bg-[rgba(167,139,250,0.15)] text-purple-300 border-[rgba(167,139,250,0.3)]' },
+  { name: '布鲁姆认知金字塔', color: 'bg-[rgba(122,184,255,0.18)] text-blue-300 border-[rgba(96,165,250,0.3)]' },
+  { name: '水平思考法', color: 'bg-[rgba(196,155,255,0.18)] text-purple-300 border-[rgba(196,155,255,0.32)]' },
 ]
 
 /**
@@ -595,7 +595,7 @@ ${combinedText.slice(0, 30000)}`
       />
 
       <main className="flex flex-1 min-h-0 overflow-hidden">
-        <div className="w-[45%] min-w-0 border-r border-[rgba(255,255,255,0.06)]">
+        <div className="w-[45%] min-w-0 border-r border-[rgba(255,255,255,0.1)]">
           <PaperViewer
             paper={currentPaper}
             isLoading={isLoadingPaper}
