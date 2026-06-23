@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { FileUp, FileText, Loader2, ClipboardPaste, X, ScrollText, Trash2, Plus } from 'lucide-react';
+import { FileUp, FileText, Loader2, ClipboardPaste, X, ScrollText, Trash2, Plus, ChevronRight } from 'lucide-react';
 
 export default function PaperViewer({
   paper,
@@ -9,6 +9,7 @@ export default function PaperViewer({
   currentPaperId,
   onSelectPaper,
   onDeletePaper,
+  collapsed,
 }) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [showPaste, setShowPaste] = useState(false);
@@ -44,7 +45,6 @@ export default function PaperViewer({
 
   const handlePasteSubmit = useCallback(() => {
     if (!pasteText.trim()) return;
-    // 创建虚拟文件对象
     const blob = new Blob([pasteText], { type: 'text/plain' });
     const file = new File([blob], '粘贴的文本.txt', { type: 'text/plain' });
     onPaperUpload(file);
@@ -52,13 +52,46 @@ export default function PaperViewer({
     setShowPaste(false);
   }, [pasteText, onPaperUpload]);
 
+  // 收起状态：只显示文献图标列表
+  if (collapsed) {
+    return (
+      <div className="flex flex-col h-full items-center py-3 gap-2 overflow-y-auto">
+        {/* 上传按钮 */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="w-8 h-8 rounded-lg bg-[rgba(196,155,255,0.15)] border border-[rgba(196,155,255,0.22)] flex items-center justify-center text-[#c49bff] hover:bg-[rgba(196,155,255,0.25)] transition-colors cursor-pointer"
+          title="上传新文献"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+        <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileChange} />
+
+        {/* 文献图标 */}
+        {papers.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => onSelectPaper(p)}
+            title={p.title}
+            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+              p.id === currentPaperId
+                ? 'bg-[rgba(196,155,255,0.25)] border border-[rgba(196,155,255,0.4)] text-[#c49bff]'
+                : 'bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] text-[#a898c4] hover:text-[#d4c8e8] hover:bg-[rgba(255,255,255,0.1)]'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* 标题栏 */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.1)]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-2">
           <ScrollText className="w-4 h-4 text-[#c49bff]" />
-          <span className="text-sm font-medium text-[#f5f0ff]">文献列表</span>
+          <span className="text-sm font-medium text-[#f5f0ff]">文献</span>
           {papers.length > 0 && (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(196,155,255,0.18)] text-[#c49bff] border border-[rgba(196,155,255,0.22)]">
               {papers.length}
@@ -74,14 +107,13 @@ export default function PaperViewer({
             {/* 继续上传按钮 */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer group"
+              className="w-full glass-card rounded-lg p-2.5 flex items-center gap-2 hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer group"
             >
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#a78bfa]/15 to-[#60a5fa]/15 flex items-center justify-center border border-[rgba(196,155,255,0.18)]">
-                <Plus className="w-4 h-4 text-[#c49bff]" />
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#a78bfa]/15 to-[#60a5fa]/15 flex items-center justify-center border border-[rgba(196,155,255,0.18)]">
+                <Plus className="w-3.5 h-3.5 text-[#c49bff]" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-[#f5f0ff]">上传新文献</p>
-                <p className="text-[10px] text-[#a898c4]">PDF、Word 或粘贴文本</p>
+                <p className="text-[13px] font-medium text-[#f5f0ff]">上传新文献</p>
               </div>
               <input
                 ref={fileInputRef}
@@ -96,14 +128,13 @@ export default function PaperViewer({
             {!showPaste ? (
               <button
                 onClick={() => setShowPaste(true)}
-                className="w-full glass-card rounded-lg p-3 flex items-center gap-2 hover:border-[rgba(34,211,238,0.3)] transition-all cursor-pointer"
+                className="w-full glass-card rounded-lg p-2.5 flex items-center gap-2 hover:border-[rgba(94,228,240,0.3)] transition-all cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-lg bg-[rgba(94,228,240,0.12)] flex items-center justify-center">
-                  <ClipboardPaste className="w-4 h-4 text-[#5ee4f0]" />
+                <div className="w-6 h-6 rounded-md bg-[rgba(94,228,240,0.12)] flex items-center justify-center">
+                  <ClipboardPaste className="w-3.5 h-3.5 text-[#5ee4f0]" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-[#f5f0ff]">粘贴论文文本</p>
-                  <p className="text-[10px] text-[#a898c4]">直接粘贴论文内容</p>
+                  <p className="text-[13px] font-medium text-[#f5f0ff]">粘贴论文文本</p>
                 </div>
               </button>
             ) : (
@@ -139,7 +170,7 @@ export default function PaperViewer({
               <div
                 key={p.id}
                 onClick={() => onSelectPaper(p)}
-                className={`glass-card rounded-lg p-3 cursor-pointer transition-all duration-200 hover:border-[rgba(196,155,255,0.32)] ${
+                className={`glass-card rounded-lg p-2.5 cursor-pointer transition-all duration-200 hover:border-[rgba(196,155,255,0.32)] ${
                   p.id === currentPaperId
                     ? 'bg-[rgba(196,155,255,0.18)] border-[rgba(196,155,255,0.32)]'
                     : 'hover:bg-[rgba(255,255,255,0.02)]'
@@ -149,16 +180,16 @@ export default function PaperViewer({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <FileText className="w-3 h-3 text-[#a898c4] shrink-0" />
-                      <p className="text-sm font-medium text-[#f5f0ff] truncate">{p.title}</p>
+                      <p className="text-[13px] font-medium text-[#f5f0ff] truncate">{p.title}</p>
                     </div>
-                    <p className="text-[10px] text-[#a898c4] mt-0.5 truncate">{p.fileName} · {new Date(p.uploadDate).toLocaleDateString('zh-CN')}</p>
+                    <p className="text-[10px] text-[#a898c4] mt-0.5 truncate">{p.fileName}</p>
                   </div>
                   <button
                     onClick={(e) => onDeletePaper(p.id, e)}
-                    className="p-1.5 rounded-md text-[#7a6a9a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors shrink-0"
+                    className="p-1 rounded-md text-[#7a6a9a] hover:text-red-400 hover:bg-[rgba(239,68,68,0.08)] transition-colors shrink-0"
                     title="删除"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
@@ -172,16 +203,16 @@ export default function PaperViewer({
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`w-full max-w-md glass-card rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 ${
+              className={`w-full glass-card rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 ${
                 isDragOver ? 'drop-zone-active scale-[1.02]' : 'hover:border-[rgba(196,155,255,0.32)]'
               }`}
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center mx-auto mb-4 border border-[rgba(196,155,255,0.22)]">
-                <FileUp className="w-8 h-8 text-[#c49bff]" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#a78bfa]/20 to-[#60a5fa]/20 flex items-center justify-center mx-auto mb-3 border border-[rgba(196,155,255,0.22)]">
+                <FileUp className="w-7 h-7 text-[#c49bff]" />
               </div>
-              <p className="text-[#f5f0ff] font-medium mb-1.5">拖拽文献到这里</p>
-              <p className="text-[#a898c4] text-sm mb-4">支持 PDF、Word 文档格式</p>
-              <button className="btn-secondary px-4 py-2 rounded-lg text-sm">
+              <p className="text-[#f5f0ff] font-medium mb-1 text-sm">拖拽文献到这里</p>
+              <p className="text-[#a898c4] text-xs mb-3">支持 PDF、Word 文档格式</p>
+              <button className="btn-secondary px-4 py-2 rounded-lg text-xs">
                 选择文件
               </button>
               <input
@@ -193,18 +224,16 @@ export default function PaperViewer({
               />
             </div>
 
-            {/* 或 */}
-            <div className="flex items-center gap-3 my-5 w-full max-w-md">
+            <div className="flex items-center gap-3 my-4 w-full">
               <div className="flex-1 h-px bg-[rgba(255,255,255,0.1)]" />
               <span className="text-xs text-[#7a6a9a]">或</span>
               <div className="flex-1 h-px bg-[rgba(255,255,255,0.1)]" />
             </div>
 
-            {/* 粘贴文本 */}
             {!showPaste ? (
               <button
                 onClick={(e) => { e.stopPropagation(); setShowPaste(true); }}
-                className="w-full max-w-md glass-card rounded-xl p-4 flex items-center gap-3 text-left hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer"
+                className="w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left hover:border-[rgba(196,155,255,0.32)] transition-all cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-lg bg-[rgba(94,228,240,0.12)] flex items-center justify-center">
                   <ClipboardPaste className="w-5 h-5 text-[#5ee4f0]" />
@@ -215,7 +244,7 @@ export default function PaperViewer({
                 </div>
               </button>
             ) : (
-              <div className="w-full max-w-md glass-card rounded-xl p-4 animate-fade-in-scale">
+              <div className="w-full glass-card rounded-xl p-4 animate-fade-in-scale">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-[#f5f0ff]">粘贴论文内容</span>
                   <button
@@ -243,29 +272,6 @@ export default function PaperViewer({
           </div>
         )}
       </div>
-
-      {/* 当前论文内容预览 */}
-      {currentPaperId && paper && (
-        <div className="border-t border-[rgba(255,255,255,0.1)] flex-1 overflow-hidden relative min-h-[200px]">
-          {isLoading ? (
-            <div className="h-full flex flex-col items-center justify-center">
-              <Loader2 className="w-8 h-8 text-[#c49bff] animate-spin mb-3" />
-              <p className="text-sm text-[#a898c4]">正在解析文献...</p>
-            </div>
-          ) : (
-            <div className="h-full overflow-y-auto p-3">
-              <div className="glass-card rounded-xl p-4 animate-fade-in">
-                <div className="text-sm text-[#d4c8e8] leading-relaxed whitespace-pre-wrap font-mono text-[13px] max-h-[400px] overflow-y-auto">
-                  {paper.textContent.slice(0, 2000)}
-                  {paper.textContent.length > 2000 && (
-                    <span className="text-[#7a6a9a] text-xs">...（已截取前2000字）</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

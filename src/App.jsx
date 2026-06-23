@@ -170,6 +170,7 @@ export default function App() {
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false)
   const [students, setStudents] = useState([])
   const [activeStudentId, setActiveStudentId] = useState(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const messagesRef = useRef(messages)
   messagesRef.current = messages
@@ -595,7 +596,29 @@ ${combinedText.slice(0, 30000)}`
       />
 
       <main className="flex flex-1 min-h-0 overflow-hidden">
-        <div className="w-[45%] min-w-0 border-r border-[rgba(255,255,255,0.1)]">
+        {/* 文献侧边栏 - 可收起 */}
+        <div
+          className={`transition-all duration-300 ease-in-out border-r border-[rgba(255,255,255,0.1)] flex flex-col ${
+            sidebarCollapsed ? 'w-12' : 'w-[22%] min-w-[220px] max-w-[320px]'
+          }`}
+        >
+          {/* 收起/展开按钮 */}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-5 h-16 rounded-r-lg bg-[rgba(60,38,95,0.6)] border border-l-0 border-[rgba(196,155,255,0.2)] flex items-center justify-center text-[#c49bff] hover:text-[#f5f0ff] hover:bg-[rgba(60,38,95,0.8)] transition-all cursor-pointer"
+            style={{ marginLeft: sidebarCollapsed ? '48px' : 'calc(22% - 5px)' }}
+          >
+            <svg
+              className={`w-3 h-3 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
           <PaperViewer
             paper={currentPaper}
             isLoading={isLoadingPaper}
@@ -604,9 +627,12 @@ ${combinedText.slice(0, 30000)}`
             currentPaperId={currentPaper?.id}
             onSelectPaper={handleSelectPaper}
             onDeletePaper={handleDeletePaper}
+            collapsed={sidebarCollapsed}
           />
         </div>
-        <div className="w-[55%] min-w-0">
+
+        {/* 对话主区域 */}
+        <div className="flex-1 min-w-0">
           <ChatPanel
             messages={messages}
             isTyping={isTyping}
